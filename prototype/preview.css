@@ -427,6 +427,9 @@ html.pv-app .hwb,
 html.pv-app:not(.pv-full) .gpill,
 html.pv-app:not(.pv-full) .sbar { display: none !important; }
 
+/* Sign-in draws its status bar in the flow: hidden, keeping its space. */
+html.pv-app:not(.pv-full) .au-sb { visibility: hidden; }
+
 html.pv-app .fab { display: grid; }
 
 html.pv-app #settings {
