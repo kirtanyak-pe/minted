@@ -420,6 +420,15 @@ html.pv-app .phone {
 
 html.pv-app:not(.pv-full) .phone { margin-top: -24px; }
 
+/* As tall as the window (preview.js); the pinned bottom layer keeps its 800-tall layout and moves (by top, as its
+   transform belongs to the prototype's own animations). */
+html.pv-app .phone,
+html.pv-app .device,
+html.pv-app .screen,
+html.pv-app #groW .c { height: var(--pv-app-h, 800px) !important; }
+
+html.pv-app .fixed.bottom { top: var(--pv-app-shift, 0px); }
+
 html.pv-app .device { border-radius: 0; }
 
 html.pv-app .cam,

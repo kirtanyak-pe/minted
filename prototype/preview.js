@@ -143,7 +143,9 @@
   // ---- App mode: on a phone (and in the Android app), the app itself, full screen — no frame, no stage, no panel ----
   // Installed full screen (manifest display: fullscreen, or ?fullscreen) the phone's own bars are hidden, so the
   // mockup's status bar and gesture pill stay. Otherwise the phone's real bars show and the mockup's 24px status bar is
-  // cut off the top. The 360 × 800 screens scale to fit; the edges and the browser's bar take the screen's colour.
+  // cut off the top. The screens fill the width and are as tall as the window (--pv-app-h, in the screens' 360-wide
+  // units): scrolling areas and bottom sheets follow the height, and the pinned bottom layer (.fixed.bottom: navbar,
+  // CTAs) moves by the difference from 800 (--pv-app-shift). The browser's bar takes the screen's colour.
   const SB = 24
   const fullscreen = new URLSearchParams(location.search).has('fullscreen') || matchMedia('(display-mode: fullscreen)').matches
   root.classList.toggle('pv-full', fullscreen)
@@ -161,13 +163,18 @@
   screenColor()
 
   function appFit() {
-    const h = 800 - (fullscreen ? 0 : SB)
-    const k = Math.min(innerWidth / 360, innerHeight / h)
+    const top = fullscreen ? 0 : SB
+    let k = innerWidth / 360
+    let h = innerHeight / k + top
+    // Far shorter than the design (a wide window): the whole 800-tall screen, scaled to the height, instead.
+    if (h < 700) { h = 800; k = innerHeight / (h - top) }
     phone.style.transform = `scale(${k})`
     wrap.style.width = 360 * k + 'px'
-    wrap.style.height = h * k + 'px'
+    wrap.style.height = (h - top) * k + 'px'
+    root.style.setProperty('--pv-app-h', h + 'px')
+    root.style.setProperty('--pv-app-shift', h - 800 + 'px')
     root.style.setProperty('--pv-app-x', Math.max(0, (innerWidth - 360 * k) / 2) + 'px')
-    root.style.setProperty('--pv-app-y', Math.max(0, (innerHeight - h * k) / 2) + 'px')
+    root.style.setProperty('--pv-app-y', Math.max(0, (innerHeight - (h - top) * k) / 2) + 'px')
     settings.style.maxHeight = ''
   }
 
