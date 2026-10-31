@@ -192,6 +192,16 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .screen.on{display:block;animation:fade .18s ease-out}
 @keyframes fade{from{opacity:.25}}
 @media (prefers-reduced-motion:reduce){.screen.on{animation:none}}
+/* page push / back: the new page slides in over the old one (which drifts left); back slides the top page out */
+.screen.leaving{display:block;pointer-events:none}
+.screen.nav-push.on{z-index:3;animation:navIn .32s cubic-bezier(.2,0,0,1);box-shadow:-12px 0 32px rgba(0,0,0,.28)}
+.screen.nav-push.leaving{z-index:2;animation:navUnder .32s cubic-bezier(.2,0,0,1) forwards}
+.screen.nav-back.leaving{z-index:3;animation:navOut .3s cubic-bezier(.2,0,0,1) forwards;box-shadow:-12px 0 32px rgba(0,0,0,.28)}
+.screen.nav-back.on{z-index:2;animation:navReturn .3s cubic-bezier(.2,0,0,1)}
+@keyframes navIn{from{transform:translateX(100%)}to{transform:none}}
+@keyframes navUnder{to{transform:translateX(-30%);filter:brightness(.7)}}
+@keyframes navOut{to{transform:translateX(100%)}}
+@keyframes navReturn{from{transform:translateX(-30%);filter:brightness(.7)}to{transform:none}}
 .scroll{position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
 .scroll::-webkit-scrollbar{display:none}
 /* no scroll indicators anywhere inside the phone (vertical pages, card rows, chip rows, search results) */
