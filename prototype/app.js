@@ -407,14 +407,16 @@ function applyMode(m,save){m=m==='light'?'light':'dark';document.documentElement
  if(save){try{localStorage.setItem('kuber-mode',m);}catch(e){}setHash();}}
 mEl.addEventListener('click',e=>{const b=e.target.closest('[data-appearance]');if(b)applyMode(b.dataset.appearance,true);});
 addEventListener('hashchange',()=>{const m=location.hash.match(/mode=(\w+)/);if(m)applyMode(m[1],false);});
-(()=>{const m=location.hash.match(/mode=(\w+)/);let k=m&&m[1];if(!k){try{k=localStorage.getItem('kuber-mode');}catch(e){}}applyMode(k||'dark',false);})();
+/* Dark is the default (user, 2026-10-31): every page load starts dark — a saved or linked Light isn't restored. Only the
+   All flows tiles (iframes) take the mode from their address, so they match the toggle. */
+(()=>{const m=self!==top&&location.hash.match(/mode=(\w+)/);applyMode(m?m[1]:'dark',false);if(self===top&&/mode=light/.test(location.hash)){try{history.replaceState(null,'',location.hash.replace('mode=light','mode=dark'));}catch(e){}}})();
 
 /* --- colour profile: Standard (original theme hexes) / Vivid · Accessible (L3 ♿ Accessible Kuber + vivid brand) --- */
 const VIVID={minted:['#77C48C','#326C44'],blue:['#3D8BFF','#1F63E0'],mint:['#2FD4B4','#0E8C76'],gold:['#FFB524','#B57A00'],rose:['#FF5FA2','#C2387A'],lavender:['#9B7BFF','#6B4BE0']};
 const pEl=document.getElementById('pals');
 function paintSwatches(){const r=document.documentElement,a=r.dataset.pal==='a11y',lt=r.dataset.mode==='light';
  $$('#themes [data-theme]').forEach(b=>{const t=THEMES.find(x=>x[0]===b.dataset.theme);const h=a?VIVID[t[0]][lt?1:0]:t[2];b.querySelector('i').style.background=h;b.querySelector('small').textContent=h;});}
-function applyPal(p,save){p=p==='a11y'?'a11y':'std';document.documentElement.dataset.pal=p;
+function applyPal(p,save){p=p==='a11y'?'a11y':'std';document.documentElement.dataset.pal=p;document.documentElement.dataset.contrast=p==='a11y'?'accessible':'standard';/* L3 Kuber tokens follow the profile */
  $$('[data-pal-set]',pEl).forEach(b=>b.setAttribute('aria-pressed',b.dataset.palSet===p));if(typeof paintSwatches==='function'&&window.THEMES_READY)paintSwatches();
  if(save){try{localStorage.setItem('kuber-pal',p);}catch(e){}setHash();}}
 pEl.addEventListener('click',e=>{const b=e.target.closest('[data-pal-set]');if(b)applyPal(b.dataset.palSet,true);});
@@ -469,7 +471,7 @@ const inr2=v=>v.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionD
     L('Leverage',138.5,121)+V(p.lev+'x',138.5,137,pen)+
     L('Avg. Entry',228.5,121)+V(inr2(p.entry),228.5,137)+
     `<i class="fp-div" style="left:28.5px;top:${y+181}px"></i>`+
-    [['Increase',28.5,96,''],['Exit Options',132.5,96,''],['Exit',237.5,94,' fp-exit']].map(([l,bx,bw,c])=>`<button class="fp-btn${c}" data-fact="${l}" data-tk="${p.tk}" style="left:${bx}px;top:${y+194}px;width:${bw}px;height:32px">${l}</button>`).join('');}
+    [['Increase',28.5,96,''],['Exit Options',132.5,96,''],['Exit',237.5,94,' fp-exit']].map(([l,bx,bw,c])=>`<button class="fp-btn${c} l3-btn" data-variant="tertiary" data-size="sm" data-fact="${l}" data-tk="${p.tk}" style="left:${bx}px;top:${y+194}px;width:${bw}px;height:32px">${l}</button>`).join('');}
   return [x,h];}
  
 function renderF(){let y=306,html='';FPOS.forEach(p=>{const [x,h]=card(p,y);html+=x;y+=h+16;});fp.innerHTML=html;fp._h=y;}
@@ -731,7 +733,7 @@ function spPillPos(){priceRow();const pill=$('.lvs-pill',s04el),chg=$('#s04 [dat
 // bottom sheet with logo · name · live price + slider
 (()=>{const dv=document.getElementById('device');dv.insertAdjacentHTML('beforeend',`<div class="lsh-bg" id="lvsheet-bg" hidden></div><div class="lsh" id="lvsheet" role="dialog" aria-modal="true" aria-label="Leverage" hidden>
  <div class="lsh-grab"></div><div class="lsh-hd"><i class="im lsh-logo"></i><div><p class="lsh-name"></p><p><b class="lsh-price"></b> <span class="lsh-chg"></span></p></div><button class="lsh-x" aria-label="Close">✕</button></div>
- <div class="lsh-body"></div><button class="lsh-done">Done</button></div>`);
+ <div class="lsh-body"></div><button class="lsh-done l3-btn" data-variant="primary" data-size="lg">Done</button></div>`);
  const bg=$('#lvsheet-bg'),sh=$('#lvsheet');
  window.lvSheet=o=>{if(o){const st=cur,lg=$('.lsh-logo',sh);lg.className='im lsh-logo'+(st.img?' '+st.img:'');lg.style.background=st.img?'':st.col;lg.textContent=st.img?'':st.tk[0];
    $('.lsh-name',sh).textContent=trunc12(st.name);const body=$('.lsh-body',sh);body.innerHTML=`<div class="lvs-host in-sheet" style="position:relative;width:328px;height:108px">${lvsHTML({ticks:true,help:true},328)}</div>`;wireLvs($('.lvs-host',body));setLev(SP.lev,true);}
@@ -923,7 +925,7 @@ const fmtCD=sec=>{sec=Math.max(0,Math.floor(sec));const h=Math.floor(sec/3600),m
   <p class="mh-h">US Market Hours</p><p class="mh-s">Shown in IST. Hours move one hour later when US daylight saving time ends.</p>
   ${MSES.map(s=>`<div class="mh-r"><i style="background:${s.c}"></i><div><b>${s.hol||s.t}</b>${s.liq?`<small>${s.liq}</small>`:''}</div><span>${s.hrs}</span></div>`).join('')}
   <div class="mh-n"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M8 7.2v3.6M8 5.2v.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><p>Trading hours and liquidity levels vary by trading session. All times are shown in Indian Standard Time (IST).</p></div>
-  <button class="lsh-done mh-ok">Okay</button></div>`);
+  <button class="lsh-done mh-ok l3-btn" data-variant="primary" data-size="lg">Okay</button></div>`);
  const bg=$('#mh-bg'),sh=$('#mh');const open=o=>{bg.hidden=!o;sh.hidden=!o;};
  $('.msc-i',msc).addEventListener('click',e=>{e.stopPropagation();open(true);});msc.addEventListener('click',e=>{e.stopPropagation();open(true);});
  bg.addEventListener('click',()=>open(false));$('.mh-ok',sh).addEventListener('click',()=>open(false));sh.addEventListener('click',e=>e.stopPropagation());})();
@@ -991,7 +993,7 @@ const LEGAL={l0:'Footer only',l1:'Notice in hero card',l2:'Hero caption line',l3
  // shared risk sheet
  dv.insertAdjacentHTML('beforeend',`<div class="lsh-bg" id="risk-bg" hidden></div><div class="lsh risk" id="risk" role="dialog" aria-modal="true" aria-labelledby="risk-h" hidden><div class="lsh-grab"></div>
   <p class="mh-h dsh-h" id="risk-h">Risk disclosure</p><p class="dsh-t">${DISC_TXT}</p>
-  <p class="dsh-tc"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="1" y="1" width="14" height="14" rx="4" fill="currentColor"/><path d="M4.6 8.2l2.2 2.2 4.6-4.8" fill="none" stroke="var(--bg)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>I agree to the <a href="#" onclick="return false">Terms &amp; Conditions</a></span></p><button class="lsh-done risk-ok">I understand</button></div>`);
+  <p class="dsh-tc"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="1" y="1" width="14" height="14" rx="4" fill="currentColor"/><path d="M4.6 8.2l2.2 2.2 4.6-4.8" fill="none" stroke="var(--bg)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>I agree to the <a href="#" onclick="return false">Terms &amp; Conditions</a></span></p><button class="lsh-done risk-ok l3-btn" data-variant="primary" data-size="lg">I understand</button></div>`);
  const rbg=$('#risk-bg'),rsh=$('#risk');let modal=false;
  window.riskSheet=(o,m)=>{modal=!!m;rbg.hidden=!o;rsh.hidden=!o;};
  rbg.addEventListener('click',()=>{if(!modal)riskSheet(false);});$('.risk-ok',rsh).addEventListener('click',()=>{try{localStorage.setItem('kuber-risk-ok','1');}catch(e){}riskSheet(false);});rsh.addEventListener('click',e=>e.stopPropagation());
@@ -1144,7 +1146,7 @@ window.CA_LEV=false;
    <div class="lvx-r"><span>₹1,000</span><span><b>4x</b></span><span class="up">+₹40</span><span class="dn">−₹40</span></div></div>
   <p class="lvx-n"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M8 4.8v4M8 11v.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span><b>Liquidation risk.</b> At 4x, a 25% price drop closes your position and you lose your ₹1,000.</span></p>
   <div class="lvx-ft"><button class="lvx-dont" role="checkbox" aria-checked="false"><i>${chk}</i><span>Don’t show this again</span></button>
-  <button class="lsh-done lvx-ok">Confirm</button></div></div>`);
+  <button class="lsh-done lvx-ok l3-btn" data-variant="primary" data-size="lg">Confirm</button></div></div>`);
  const bg=$('#lvx-bg'),sh=$('#lvx'),dont=$('.lvx-dont',sh);
  const open=o=>{bg.hidden=!o;sh.hidden=!o;};
  dont.addEventListener('click',e=>{e.stopPropagation();dont.setAttribute('aria-checked',dont.getAttribute('aria-checked')!=='true');});
@@ -1217,7 +1219,7 @@ window.CA_LEV=false;
  const open=o=>{bg.hidden=sh.hidden=!o;};
  function draw(){const Q=QZ[i];sh.style.setProperty('--qp',((i+1)/QZ.length*100)+'%');body.innerHTML=`<p class="qz-n">Question ${i+1} of ${QZ.length}</p><p class="qz-q">${Q.q}</p>${Q.o.map((t,k)=>`<button class="qz-o ${pick===null?'':k===Q.a?'ok':k===pick?'no':''}" data-o="${k}" ${pick!==null?'disabled':''}>${t}</button>`).join('')}
   ${pick!==null?`<p class="qz-w ${pick===Q.a?'ok':'no'}">${pick===Q.a?'Correct. ':'Not quite. '}${Q.why}</p>`:''}
-  <button class="lsh-done qz-go" ${pick===null?'disabled':''}>${pick===null?'Choose an answer':pick!==Q.a?'Try again':i<QZ.length-1?'Next':'Start trading'}</button>`;}
+  <button class="lsh-done qz-go l3-btn" data-variant="primary" data-size="lg" ${pick===null?'disabled':''}>${pick===null?'Choose an answer':pick!==Q.a?'Try again':i<QZ.length-1?'Next':'Start trading'}</button>`;}
  body.addEventListener('click',e=>{e.stopPropagation();const o=e.target.closest('[data-o]');if(o&&pick===null){pick=+o.dataset.o;draw();return;}
   if(e.target.closest('.qz-go')&&pick!==null){if(pick!==QZ[i].a){pick=null;draw();return;}if(i<QZ.length-1){i++;pick=null;draw();return;}
    try{localStorage.setItem('kuber-quiz-ok','1');}catch(x){}open(false);const d=done;done=null;if(d)d();}});
@@ -1244,7 +1246,7 @@ window.CA_LEV=false;
   <p class="qd-s">Start trading with leverage on Minted!</p>
   <p class="qd-i"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M9 2.2L16.6 15.5H1.4z" fill="currentColor"/><path d="M9 7v4M9 13v.1" stroke="var(--bg)" stroke-width="1.6" stroke-linecap="round"/></svg>Important</p>
   <p class="qd-b">There is a high element of risk while trading with leverage. You have the potential to earn high profits but also face the risk of significant losses. In an extreme price movement, there is a chance that all your locked margin will be liquidated. Please analyse your investment objectives and risk appetite carefully before trading. Minted will not be liable for any losses suffered. <a href="#" onclick="return false">T&amp;C</a></p>
-  <button class="lsh-done qd-ok">I Understand</button></div>`);
+  <button class="lsh-done qd-ok l3-btn" data-variant="primary" data-size="lg">I Understand</button></div>`);
  const bg=$('#qd-bg'),sh=$('#qd');let cb=null;const close=go=>{bg.hidden=sh.hidden=true;const f=cb;cb=null;if(go&&f)f();};
  $('.qd-ok',sh).addEventListener('click',e=>{e.stopPropagation();close(true);});$('.qd-x',sh).addEventListener('click',e=>{e.stopPropagation();close(false);});
  bg.addEventListener('click',()=>close(false));sh.addEventListener('click',e=>e.stopPropagation());
@@ -1263,7 +1265,7 @@ window.CA_LEV=false;
  dv.insertAdjacentHTML('beforeend',`<div class="fq" id="fq" role="dialog" aria-modal="true" aria-labelledby="fq-h" hidden><div class="fq-sb"><b>08:11</b><span>▾ ◢ ▮</span></div>
   <div class="fq-hd"><p id="fq-h">Leverage Quiz</p><button class="fq-x" aria-label="Exit quiz"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button></div>
   <div class="fq-pg">${FQ.map(()=>'<i></i>').join('')}</div><div class="fq-body"></div><div class="fq-fb" hidden><p class="fq-fbt"></p><p class="fq-fbb"></p></div>
-  <div class="fq-ft"><button class="fq-prev">Previous</button><button class="fq-next">Next</button></div></div>`);
+  <div class="fq-ft"><button class="fq-prev l3-btn" data-variant="secondary" data-size="lg">Previous</button><button class="fq-next l3-btn" data-variant="primary" data-size="lg">Next</button></div></div>`);
  const el=$('#fq'),body=$('.fq-body',el),fb=$('.fq-fb',el),prev=$('.fq-prev',el),next=$('.fq-next',el),segs=[...el.querySelectorAll('.fq-pg i')];
  let i=0,ans=[],done=null,exit=null;
  function draw(){const Q=FQ[i],p=ans[i];segs.forEach((s,k)=>s.classList.toggle('on',k<=i));
@@ -1284,7 +1286,7 @@ window.QUIZV='q2';   /* Q2 (CoinSwitch-style intro + 7-question quiz) is the def
   <p class="q2-k"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M9.2 1.5L3.5 9h3.8l-.9 5.5L12.5 7H8.6z" fill="currentColor"/></svg>Leverage</p>
   <p class="q2-pre">Before you begin…</p><p class="q2-h" id="q2-h">Take this short quiz to start trading with leverage</p>
   <span class="q2-tag">Mandatory Quiz • One-time</span>
-  <button class="lsh-done q2-start">Start Quiz</button><button class="q2-exit">Exit Leverage</button></div>`);
+  <button class="lsh-done q2-start l3-btn" data-variant="primary" data-size="lg">Start Quiz</button><button class="q2-exit">Exit Leverage</button></div>`);
  const bg=$('#q2-bg'),sh=$('#q2');let onPass=null,onExit=null;const open=o=>{bg.hidden=sh.hidden=!o;};
  window.openQuizIntro=(pass,exit)=>{onPass=pass;onExit=exit;open(true);};
  $('.q2-start',sh).addEventListener('click',e=>{e.stopPropagation();open(false);openFullQuiz(()=>{if(onPass)onPass();},()=>{if(onExit)onExit();});});
@@ -1495,7 +1497,7 @@ function build(el,kind){const ok=kind==='ok',stk=kind==='stk';el.className='c pr
  <div class="grp"><div class="ico"><div class="gl"><svg viewBox="0 0 200 200"><defs><radialGradient id="gls_${kind}" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#000"/><stop offset=".6" stop-color="#000"/><stop offset=".82" stop-color="#0f0f10"/><stop offset=".96" stop-color="#242427"/><stop offset="1" stop-color="#0b0b0c"/></radialGradient><linearGradient id="spc_${kind}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/></linearGradient></defs><circle cx="100" cy="100" r="82" fill="url(#gls_${kind})"/><circle cx="100" cy="100" r="81.5" fill="none" stroke="rgba(255,255,255,.07)"/><path d="M38 70 A68 68 0 0 1 92 30" fill="none" stroke="url(#spc_${kind})" stroke-width="6" stroke-linecap="round" opacity=".7"/></svg><svg viewBox="0 0 200 200" class="rs"><defs><linearGradient id="rgg_${kind}" gradientUnits="userSpaceOnUse" x1="0" y1="6" x2="0" y2="194"><stop offset="0" stop-color="#7E7E84"/><stop offset=".5" stop-color="#C8C8CC"/><stop offset="1" stop-color="#FFFFFF"/></linearGradient></defs><path class="rp" d="" fill="none" stroke="url(#rgg_${kind})" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg><svg viewBox="0 0 200 200" class="dp"><defs><filter id="goo_${kind}" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3.2"/><feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9"/></filter><clipPath id="pool_${kind}"><circle cx="100" cy="100" r="82"/></clipPath></defs><circle class="rip" cx="100" cy="100" r="0" fill="none" stroke="rgba(235,235,240,.6)" stroke-width="1"/><g class="gg" filter="url(#goo_${kind})" fill="#F2F2F2" clip-path="url(#pool_${kind})"><path class="nk" d=""/><ellipse class="hd" cx="100" cy="100" rx="11" ry="11"/></g></svg></div><svg class="orb" viewBox="0 0 84 84" aria-hidden="true"><defs><linearGradient id="orbg_${kind}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#E8E8E8" stop-opacity="0"/><stop offset="1" stop-color="#FFFFFF"/></linearGradient></defs><circle cx="41.6" cy="41.6" r="37" fill="none" stroke="rgba(232,232,232,.10)" stroke-width="1.5"/><circle class="arc2" cx="41.6" cy="41.6" r="37" fill="none" stroke="url(#orbg_${kind})" stroke-width="2" stroke-linecap="round" stroke-dasharray="70 163"/></svg><span class="ring"></span><span class="ring r2"></span>${hg}${stk?'<span class="burst"></span>':`<span class="burst"></span>${ok?OK_ICON:BAD_ICON}`}</div>
  <p class="t t1">Buy TSLA</p><p class="t t2">${TITLES[0]}</p><div class="div"></div><div class="pb" aria-hidden="true"><i></i></div><p class="t t3">It will take less than a minute</p>
  ${stk?`<p class="note">This may take up to 2 minutes</p><ol class="stp" aria-label="Order status"><li class="sp done"><span class="dot"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5.2L4.1 7.2L8 3" stroke="#392A00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="lbl">Placed</span></li><li class="sp cur"><span class="dot"></span><span class="lbl">Processing</span></li><li class="sp"><span class="dot"></span><span class="lbl">Completed</span></li></ol>`:''}</div>
- ${stk?'':'<div class="sheet"><div class="h"></div><div class="card"></div><div class="row"></div></div>'}<div class="cta">View Position</div>`;}
+ ${stk?'':'<div class="sheet"><div class="h"></div><div class="card"></div><div class="row"></div></div>'}<div class="cta l3-btn" data-variant="primary" data-size="lg">View Position</div>`;}
 
 // ---------- glass-ring loader engine (same motion as the standalone glass-ring artifact) ----------
 const GLC=4400,GR=92,GCORE=82,GPD=700,GAX=[Math.SQRT1_2,-Math.SQRT1_2,0],GCI=2*Math.PI*GR,GX=100,GY=100,GF=182,GD=11;
@@ -2078,26 +2080,26 @@ const AUTH={splash:'s5',mode:'otp',num:'',otp:'',pin:'',done:null};
    <div class="sp-badges"><span><svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 .8-5.2 4.8 1.4 7L12 17.5 5.8 21l1.4-7L2 9.3l7-.8z" fill="currentColor"/></svg><b>4.4+</b>Rated</span><span><svg width="18" height="18" viewBox="0 0 24 24"><path d="M3 10l9-6 9 6M5 10v9M19 10v9M9 10v9M15 10v9M3 21h18" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><b>FIU</b>Registered</span><span><svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.4 9.3-8 11-4.6-1.7-8-6-8-11V5z" fill="currentColor"/></svg><b>ISO</b>Certified</span></div></div>`,
   login:()=>`${sb}<div class="au-top"><span></span><button class="au-help">Help</button></div><div class="au-body"><h1>Enter Your Mobile Number</h1><p class="au-sub">We will send you an SMS with a verification code on this number</p>
    <p class="au-big ${AUTH.num?'':'ph'}">${AUTH.num?fmtNum(AUTH.num):'10 - digit number'}<i class="au-caret"></i></p></div>
-   <div class="au-foot"><button class="au-cta" data-go="tnc" ${AUTH.num.length===10?'':'disabled'}>Send OTP</button><p class="au-note">Only applicable for Indian Residents</p></div>${keypad()}`,
+   <div class="au-foot"><button class="au-cta l3-btn" data-variant="brand" data-size="lg" data-go="tnc" ${AUTH.num.length===10?'':'disabled'}>Send OTP</button><p class="au-note">Only applicable for Indian Residents</p></div>${keypad()}`,
   tnc:()=>V.login()+`<div class="au-scrim"></div><div class="au-sheet"><i class="au-grab"></i><h2>Please agree to our Terms<br>&amp; conditions</h2>
    <button class="au-chk" data-chk="a" aria-pressed="false"><i></i><span>I hereby understand and agree to the <u>Terms of Use</u>, <u>Privacy Policy</u> and <u>KYC-AML Policy</u> of Minted.</span></button>
    <button class="au-chk" data-chk="b" aria-pressed="false"><i></i><span>I accept the updated Trading Policy and agree that my basic KYC data may be shared with Minted’s trading partner.</span></button>
    <p class="au-tnc-note"><b>NOTE : </b>Tokenised perpetuals are not associated with, sponsored by, endorsed by, or affiliated with the issuer of the underlying shares, or with the exchange on which the underlying asset is listed. You get price exposure only — you do not own the underlying shares.</p>
-   <button class="au-cta" data-go="otp" disabled>I agree and generate OTP</button></div>`,
+   <button class="au-cta l3-btn" data-variant="brand" data-size="lg" data-go="otp" disabled>I agree and generate OTP</button></div>`,
   otp:()=>`${sb}<div class="au-top"><button class="au-back" data-go="login" aria-label="Back">←</button><button class="au-help">Help</button></div><div class="au-body"><h1>OTP Verification</h1><p class="au-sub">Please enter the 6-digit OTP sent to your registered email or</p>
    <p class="au-ph">+91 ${fmtNum(AUTH.num||'9846098460')} <button class="au-edit" data-go="login" aria-label="Edit number">✎</button></p>
    <p class="au-big ${AUTH.otp?'':'ph'}">${AUTH.otp||'000000'}<i class="au-caret"></i></p>
    <p class="au-rs">Didn’t receive OTP? <b>Resend OTP</b> • <b>OTP on Call</b></p><p class="au-hint">Prototype: any 6 digits work · 000000 shows the error</p></div>
    ${AUTH.err?'<div class="au-err"><i>!</i>Incorrect OTP. Please try again<button data-x="err" aria-label="Dismiss">✕</button></div>':''}
-   <div class="au-foot"><button class="au-cta" data-go="verify" ${AUTH.otp.length===6?'':'disabled'}>Verify OTP</button></div>${keypad()}`,
+   <div class="au-foot"><button class="au-cta l3-btn" data-variant="brand" data-size="lg" data-go="verify" ${AUTH.otp.length===6?'':'disabled'}>Verify OTP</button></div>${keypad()}`,
   otp2:()=>{const o=AUTH.otp,n=o.length;const bx=[0,1,2,3,4,5].map(i=>`<span class="ob ${i<n?'f':''} ${i===n?'cur':''}" style="--i:${i};--dx:${(140-(i*48+20))}px">${o[i]||''}</span>`).join('');
    return V.login()+`<div class="au-scrim o2s"></div><div class="o2 ${AUTH.err?'bad':''}"><i class="au-grab"></i><h2 class="o2t">Let’s verify your number</h2><h2 class="o2t2">Verified successfully</h2>
    <p class="o2s1">We’ve sent a 6-digit code to +91 ${fmtNum(AUTH.num||'9846098460')}.</p>
    <div class="o2row">${bx}<span class="o2ok"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9"/></svg></span></div>
    <p class="o2rs">${AUTH.err?'<span class="o2e">Incorrect code. Please try again.</span>':'Didn’t receive the code? <b>Resend</b>'}</p>
-   <button class="au-cta o2v" data-go="verify2" ${n===6?'':'disabled'}>Verify OTP</button></div>`;},
+   <button class="au-cta o2v l3-btn" data-variant="brand" data-size="lg" data-go="verify2" ${n===6?'':'disabled'}>Verify OTP</button></div>`;},
   bio:()=>`${sb}<div class="au-bio"><h1>Enable Biometrics?</h1><p class="au-sub">Secure your account with biometric access</p><svg class="au-bio-ic" width="96" height="96" viewBox="0 0 96 96" aria-hidden="true"><path d="M48.1832 22.4991C54.4053 22.4991 60.1415 23.8325 65.3915 26.4991C70.6415 29.1658 75.0998 32.9991 78.7665 37.9991L77.5998 39.1658C74.0998 34.277 69.836 30.5546 64.8082 27.9991C59.7803 25.4436 54.2387 24.1658 48.1832 24.1658C42.2943 24.1658 36.8637 25.4296 31.8915 27.9575C26.9193 30.4853 22.5998 34.1936 18.9332 39.0825L17.6832 38.3325C21.2387 33.2213 25.6553 29.3046 30.9332 26.5825C36.211 23.8602 41.961 22.4991 48.1832 22.4991ZM48.1832 30.4991C55.8498 30.4991 62.3637 33.027 67.7248 38.0825C73.086 43.138 75.7665 49.277 75.7665 56.4991C75.7665 59.0546 74.822 61.2213 72.9332 62.9991C71.0443 64.777 68.7665 65.6658 66.0998 65.6658C63.322 65.6658 60.9748 64.777 59.0582 62.9991C57.1415 61.2213 56.1832 59.0546 56.1832 56.4991C56.1832 54.388 55.4053 52.5963 53.8498 51.1241C52.2943 49.652 50.4053 48.9158 48.1832 48.9158C45.9053 48.9158 43.9887 49.652 42.4332 51.1241C40.8777 52.5963 40.0998 54.388 40.0998 56.4991C40.0998 61.9436 41.7803 66.652 45.1415 70.6241C48.5027 74.5963 53.211 77.4713 59.2665 79.2491L58.9332 80.9158C52.4887 79.1936 47.461 76.1796 43.8498 71.8741C40.2387 67.5686 38.4332 62.4436 38.4332 56.4991C38.4332 53.9436 39.3777 51.763 41.2665 49.9575C43.1553 48.152 45.461 47.2491 48.1832 47.2491C50.9053 47.2491 53.211 48.152 55.0998 49.9575C56.9887 51.763 57.9332 53.9436 57.9332 56.4991C57.9332 58.6103 58.7248 60.388 60.3082 61.8325C61.8915 63.277 63.822 63.9991 66.0998 63.9991C68.322 63.9991 70.197 63.277 71.7248 61.8325C73.2527 60.388 74.0165 58.6103 74.0165 56.4991C74.0165 49.777 71.5027 44.0825 66.4748 39.4158C61.447 34.7491 55.3498 32.4158 48.1832 32.4158C41.0165 32.4158 34.9193 34.7491 29.8915 39.4158C24.8637 44.0825 22.3498 49.777 22.3498 56.4991C22.3498 58.4991 22.572 60.5825 23.0165 62.7491C23.4609 64.9158 24.1276 67.2213 25.0165 69.6658L23.3498 70.4158C22.4609 67.8046 21.8082 65.3603 21.3915 63.0825C20.9748 60.8046 20.7665 58.6103 20.7665 56.4991C20.7665 49.388 23.4748 43.277 28.8915 38.1658C34.3082 33.0546 40.7387 30.4991 48.1832 30.4991ZM48.1832 14.0825C51.7943 14.0825 55.336 14.5269 58.8082 15.4158C62.2803 16.3047 65.822 17.6658 69.4332 19.4991L68.6832 20.9991C65.0165 19.2213 61.5165 17.9158 58.1832 17.0825C54.8498 16.2491 51.5165 15.8325 48.1832 15.8325C44.572 15.8325 41.1415 16.2352 37.8915 17.0408C34.6415 17.8463 31.3777 19.138 28.0998 20.9158L27.1832 19.5825C30.6277 17.7491 34.086 16.3741 37.5582 15.4575C41.0303 14.5408 44.572 14.0825 48.1832 14.0825ZM48.1832 38.9158C53.572 38.9158 58.0443 40.6796 61.5998 44.2075C65.1553 47.7353 66.9332 52.1103 66.9332 57.3325H65.1832C65.1832 52.4991 63.572 48.4991 60.3498 45.3325C57.1277 42.1658 53.072 40.5825 48.1832 40.5825C43.461 40.5825 39.4748 42.1241 36.2248 45.2075C32.9748 48.2908 31.3498 52.0546 31.3498 56.4991C31.3498 60.9436 32.1137 64.8463 33.6415 68.2075C35.1693 71.5686 37.8498 75.2213 41.6832 79.1658L40.4332 80.4158C36.5443 76.2491 33.7665 72.3463 32.0998 68.7075C30.4332 65.0686 29.5998 60.9991 29.5998 56.4991C29.5998 51.6103 31.4053 47.4575 35.0165 44.0408C38.6277 40.6241 43.0165 38.9158 48.1832 38.9158ZM52.6832 68.7491C50.9053 67.0825 49.5582 65.152 48.6415 62.9575C47.7248 60.763 47.2665 58.3046 47.2665 55.5825H48.9332C48.9332 58.0825 49.3498 60.3325 50.1832 62.3325C51.0165 64.3325 52.2665 66.0825 53.9332 67.5825C55.4887 69.027 57.2527 70.1241 59.2248 70.8741C61.197 71.6241 63.2387 71.9991 65.3498 71.9991C66.1277 71.9991 66.8777 71.9436 67.5998 71.8325C68.322 71.7213 69.0443 71.5825 69.7665 71.4158L70.0998 73.0825C69.322 73.2491 68.5303 73.388 67.7248 73.4991C66.9193 73.6103 66.1277 73.6658 65.3498 73.6658C62.961 73.6658 60.6832 73.2491 58.5165 72.4158C56.3498 71.5825 54.4053 70.3603 52.6832 68.7491Z" fill="#0F9958"/><path d="M0 24.75V4.75C2.57706e-07 2.12665 2.12665 0 4.75 0H24.75C25.1642 0 25.5 0.335786 25.5 0.75C25.5 1.16421 25.1642 1.5 24.75 1.5H4.75C2.95508 1.5 1.5 2.95507 1.5 4.75V24.75C1.5 25.1642 1.16421 25.5 0.75 25.5C0.335786 25.5 0 25.1642 0 24.75Z" fill="var(--text-4,#454947)"/><path d="M0 70.75V90.75C2.57706e-07 93.3734 2.12665 95.5 4.75 95.5H24.75C25.1642 95.5 25.5 95.1642 25.5 94.75C25.5 94.3358 25.1642 94 24.75 94H4.75C2.95508 94 1.5 92.5449 1.5 90.75V70.75C1.5 70.3358 1.16421 70 0.75 70C0.335786 70 0 70.3358 0 70.75Z" fill="var(--text-4,#454947)"/><path d="M95.5 24.75V4.75C95.5 2.12665 93.3734 0 90.75 0H70.75C70.3358 0 70 0.335786 70 0.75C70 1.16421 70.3358 1.5 70.75 1.5H90.75C92.5449 1.5 94 2.95507 94 4.75V24.75C94 25.1642 94.3358 25.5 94.75 25.5C95.1642 25.5 95.5 25.1642 95.5 24.75Z" fill="var(--text-4,#454947)"/><path d="M95.5 70.75V90.75C95.5 93.3734 93.3734 95.5 90.75 95.5H70.75C70.3358 95.5 70 95.1642 70 94.75C70 94.3358 70.3358 94 70.75 94H90.75C92.5449 94 94 92.5449 94 90.75V70.75C94 70.3358 94.3358 70 94.75 70C95.1642 70 95.5 70.3358 95.5 70.75Z" fill="var(--text-4,#454947)"/></svg></div>
-   <div class="au-bio-ft"><button class="au-cta" data-go="enter">Allow</button><button class="au-cta sec" data-go="enter">Skip</button></div>`,
+   <div class="au-bio-ft"><button class="au-cta sec l3-btn" data-variant="secondary" data-size="lg" data-go="enter">Skip</button><button class="au-cta l3-btn" data-variant="brand" data-size="lg" data-go="enter">Allow</button></div>`,
   pin:()=>`${sb}<div class="au-top"><span></span><button class="au-help">Help</button></div><div class="au-body au-center">${MINT_MARK()}<h1>Enter Your PIN</h1><p class="au-sub">Access your account with your 4-digit PIN</p>
    <div class="au-dots ${AUTH.err?'err':''}">${[0,1,2,3].map(i=>`<i class="${i<AUTH.pin.length?'on':''}"></i>`).join('')}</div>${AUTH.err?'<p class="au-errt">Incorrect PIN. 2 attempts remaining</p>':''}<button class="au-link">Forgot PIN</button></div>${keypad()}`};
  let scr='splash';
@@ -2193,5 +2195,51 @@ setTimeout(()=>applyPresentationDefaults(),0);
   if(e.target.closest('#play-splash'))authStart(()=>{});});})();
 
 
+
+
+/* L3 buttons drawn from the Figma export (shape .l3b + label .l3b-lb, index.html): the .hs hotspot on top of them takes
+   the taps, so its hover / press is mirrored onto the pair (styles in src/prototype-l3.css). */
+(()=>{const box=e=>[e.style.left,e.style.top,e.style.width,e.style.height].join();
+ $$('#device .l3b').forEach(sh=>{const k=box(sh),lb=(()=>{let n=sh.nextElementSibling;while(n&&!n.classList.contains('l3b-lb'))n=n.nextElementSibling;return n;})(),
+  hs=[...sh.closest('.screen').querySelectorAll('.hs')].find(h=>box(h)===k);if(hs)hs._l3=[sh,lb].filter(Boolean);});
+ const set=(e,c,on)=>{const h=e.target.closest&&e.target.closest('.hs');if(h&&h._l3)h._l3.forEach(x=>x.classList.toggle(c,on));};
+ const dv=document.getElementById('device');
+ dv.addEventListener('pointerdown',e=>set(e,'l3b-press',true));
+ ['pointerup','pointercancel','pointerout'].forEach(t=>dv.addEventListener(t,e=>set(e,'l3b-press',false)));
+ dv.addEventListener('pointerover',e=>set(e,'l3b-hover',true));dv.addEventListener('pointerout',e=>set(e,'l3b-hover',false));})();
+
+
+/* L3 interaction states for every tappable card, row, chip and key (user, 2026-10-31): hover = state layer, press =
+   pressed layer + scale 0.97 (styles in src/prototype-l3.css). L3 buttons (.l3-btn, hotspots over .l3b) have their own. */
+(()=>{const dv=document.getElementById('device'),SEL='.hs,button,a[href],[role="button"],[role="tab"],[data-to]',px=v=>parseFloat(v)||0;
+ const bx=e=>[px(e.style.left),px(e.style.top),px(e.style.width),px(e.style.height)];
+ const target=n=>{const t=n&&n.closest&&n.closest(SEL);if(!t||!dv.contains(t)||t===dv)return null;
+  if(t._l3||t.matches('.l3-btn,:disabled,[aria-disabled="true"],input,select,textarea'))return null;
+  if(t.classList.contains('hs')){const b=bx(t);if(b[2]*b[3]>360*400)return null;}return t;};
+ // What lights up and what shrinks: a hotspot tints itself and shrinks with the drawn card under it (siblings inside its box,
+ // scaled about the hotspot's centre); a real element gets a tint layer and shrinks itself.
+ function parts(t){if(t._ix)return t._ix;let g;
+  if(t.classList.contains('hs')){const b=bx(t),cx=b[0]+b[2]/2,cy=b[1]+b[3]/2;
+   const inner=[...t.parentElement.children].filter(e=>{if(e===t||e.classList.contains('hs')||!e.style.left)return false;const q=bx(e);return q[0]>=b[0]-1&&q[1]>=b[1]-1&&q[0]+q[2]<=b[0]+b[2]+1&&q[1]+q[3]<=b[1]+b[3]+1;});
+   const card=inner.find(e=>{const q=bx(e);return Math.abs(q[2]-b[2])<2&&Math.abs(q[3]-b[3])<2;});
+   if(card)t.style.borderRadius=getComputedStyle(card).borderRadius;
+   inner.forEach(e=>{if(getComputedStyle(e).transform==='none'){const q=bx(e);e.style.transformOrigin=(cx-q[0])+'px '+(cy-q[1])+'px';}});
+   g={tint:()=>t,shrink:inner};}
+  else g={tint:()=>layer(t),shrink:[t]};
+  return t._ix=g;}
+ // The tint layer over a real element, placed in #device (the preview scales the phone, so undo that).
+ let lay=null;function layer(t){const d=dv.getBoundingClientRect(),k=d.width/dv.offsetWidth||1,r=t.getBoundingClientRect();
+  if(!lay){lay=document.createElement('i');lay.className='ix-l';lay.setAttribute('aria-hidden','true');}
+  if(lay._for!==t){lay.className='ix-l';lay._for=t;Object.assign(lay.style,{left:(r.left-d.left)/k+'px',top:(r.top-d.top)/k+'px',width:r.width/k+'px',height:r.height/k+'px',borderRadius:getComputedStyle(t).borderRadius});}
+  if(lay.parentElement!==dv)dv.appendChild(lay);return lay;}
+ let hov=null,prs=null;
+ const paint=(t,c,on)=>{if(!t)return;const g=parts(t),l=g.tint();if(l)l.classList.toggle(c,on);if(c==='ix-press')g.shrink.forEach(e=>{e.classList.add('ix-s');e.classList.toggle(c,on);});};
+ const clear=()=>{paint(prs,'ix-press',false);paint(hov,'ix-hover',false);prs=hov=null;if(lay){lay.remove();lay._for=null;}};
+ dv.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const t=target(e.target);if(t===hov)return;if(hov&&hov!==prs)paint(hov,'ix-hover',false);hov=t;paint(t,'ix-hover',true);});
+ dv.addEventListener('pointerout',e=>{const t=target(e.target);if(!t||t.contains(e.relatedTarget))return;paint(t,'ix-press',false);paint(t,'ix-hover',false);if(t===hov)hov=null;if(t===prs)prs=null;if(!hov&&!prs&&lay){lay.remove();lay._for=null;}});
+ dv.addEventListener('pointerdown',e=>{const t=target(e.target);if(!t)return;prs=t;const g=parts(t);g.shrink.forEach(x=>{x.classList.add('ix-s');void x.offsetWidth;});paint(t,'ix-press',true);});
+ ['pointerup','pointercancel'].forEach(n=>dv.addEventListener(n,()=>{const t=prs;prs=null;paint(t,'ix-press',false);if(t&&t!==hov&&lay&&lay._for===t){lay.remove();lay._for=null;}}));
+ // A tap usually moves to another screen or sheet; drop the states so nothing stays lit behind it.
+ dv.addEventListener('click',()=>setTimeout(clear,180));dv.addEventListener('scroll',clear,true);})();
 
 })();

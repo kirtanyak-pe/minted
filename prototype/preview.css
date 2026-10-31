@@ -298,13 +298,6 @@ html.pv #settings > #list {
 
 .pv-item[aria-current] .pv-num { color: inherit; }
 
-.pv-flow:focus-visible,
-.pv-item:focus-visible,
-.pv-seg button:focus-visible {
-  outline: 2px solid var(--pv-text);
-  outline-offset: -2px;
-}
-
 @media (hover: hover) {
   .pv-flow:hover,
   .pv-item:not([aria-current]):hover {
@@ -471,3 +464,8 @@ html.pv-one #settings { display: none !important; }
    rule to bring it back. ---- */
 html.pv #settings,
 html.pv .fab { display: none !important; }
+
+/* ---- No focus outline or tap highlight anywhere on the site (user, 2026-10-31) ---- */
+*,
+*:focus,
+*:focus-visible { outline: none !important; -webkit-tap-highlight-color: transparent; }
