@@ -177,6 +177,26 @@
   new MutationObserver(screenColor).observe(root, { attributes: true, attributeFilter: ['data-mode', 'data-brand'] })
   screenColor()
 
+  // The phone's back (browser back, Android's system back) steps back through the screens instead of leaving the page
+  // or closing the app: while a screen other than Home shows (and sign-in, which owns the keys, doesn't), one history
+  // entry sits on top for back to take, and taking it sends the prototype its own back (Escape → go('back'); its
+  // stack is private to app.js).
+  let held = false, dropping = false
+  const backSync = () => {
+    const s = $('.screen.on'), auth = $('#auth')
+    const deep = root.classList.contains('pv-app') && !!s && s.id !== 's01' && !(auth && !auth.hidden)
+    if (deep && !held) { history.pushState({ pvBack: 1 }, ''); held = true }
+    else if (!deep && held) { held = false; dropping = true; history.back() }
+  }
+  addEventListener('popstate', () => {
+    if (dropping) { dropping = false; return }
+    held = false
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    backSync()
+  })
+  new MutationObserver(backSync).observe($('#device'), { subtree: true, attributes: true, attributeFilter: ['class', 'hidden'] })
+  backSync()
+
   function appFit() {
     const top = fullscreen ? 0 : SB
     let k = innerWidth / 360
