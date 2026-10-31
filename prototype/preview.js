@@ -140,19 +140,53 @@
   }
   setView('phone')
 
-  // ---- Fit: the phone scales to the stage (the prototype's fit() sized it to the window) ----
+  // ---- App mode: on a phone (and in the Android app), the app itself, full screen — no frame, no stage, no panel ----
+  // Installed full screen (manifest display: fullscreen, or ?fullscreen) the phone's own bars are hidden, so the
+  // mockup's status bar and gesture pill stay. Otherwise the phone's real bars show and the mockup's 24px status bar is
+  // cut off the top. The 360 × 800 screens scale to fit; the edges and the browser's bar take the screen's colour.
+  const SB = 24
+  const fullscreen = new URLSearchParams(location.search).has('fullscreen') || matchMedia('(display-mode: fullscreen)').matches
+  root.classList.toggle('pv-full', fullscreen)
+  let tint = $('meta[name="theme-color"]')
+  if (!tint) { tint = document.createElement('meta'); tint.name = 'theme-color'; document.head.append(tint) }
+  const screenColor = () => {
+    const s = $('.screen.on')
+    const c = s && getComputedStyle(s).backgroundColor
+    const bg = c && c !== 'rgba(0, 0, 0, 0)' ? c : getComputedStyle(root).getPropertyValue('--bg').trim()
+    root.style.setProperty('--pv-app-bg', bg)
+    if (tint.content !== bg) tint.content = bg
+  }
+  new MutationObserver(screenColor).observe($('#device'), { subtree: true, attributes: true, attributeFilter: ['class'] })
+  new MutationObserver(screenColor).observe(root, { attributes: true, attributeFilter: ['data-mode', 'data-brand'] })
+  screenColor()
+
+  function appFit() {
+    const h = 800 - (fullscreen ? 0 : SB)
+    const k = Math.min(innerWidth / 360, innerHeight / h)
+    phone.style.transform = `scale(${k})`
+    wrap.style.width = 360 * k + 'px'
+    wrap.style.height = h * k + 'px'
+    root.style.setProperty('--pv-app-x', Math.max(0, (innerWidth - 360 * k) / 2) + 'px')
+    root.style.setProperty('--pv-app-y', Math.max(0, (innerHeight - h * k) / 2) + 'px')
+    settings.style.maxHeight = ''
+  }
+
+  // ---- Fit: the phone scales to the stage (the prototype's fit() sized it to the window; this replaces it) ----
   const PW = 384, PH = 824
   function pvFit() {
+    const app = innerWidth <= 700
+    root.classList.toggle('pv-app', app)
+    if (app) { appFit(); return }
     const cs = getComputedStyle(stage)
-    const narrow = innerWidth <= 700
-    const w = stage.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - (narrow ? 0 : settings.offsetWidth + 24)
+    const w = stage.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - settings.offsetWidth - 24
     const h = stage.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)
-    const k = Math.min(1, w / PW, narrow ? Infinity : h / PH)
+    const k = Math.min(1, w / PW, h / PH)
     phone.style.transform = `scale(${k})`
     wrap.style.width = PW * k + 'px'
     wrap.style.height = PH * k + 'px'
-    settings.style.maxHeight = narrow ? '' : h + 'px'
+    settings.style.maxHeight = h + 'px'
   }
+  window.fit = pvFit
   addEventListener('resize', pvFit)
   new ResizeObserver(pvFit).observe(stage)
   pvFit()

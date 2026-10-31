@@ -378,32 +378,62 @@ html.pv[data-view='all'] .pv-stage > :not(.pv-all) { visibility: hidden; }
   .pv-shot:hover .pv-shot-frame { box-shadow: inset 0 0 0 1px var(--pv-line), 0 0 0 2px var(--pv-text-3); }
 }
 
-/* ---- Narrow windows: the phone on top (scaled to the width), the list under it; settings keep the prototype's
-   own gear button + bottom sheet ---- */
+/* ---- App mode (phones, the Android app: preview.js sets html.pv-app at 700px and under): the app itself, full
+   screen — no stage, bezel or panel. The phone's real status bar replaces the mockup's (cut off the top), except
+   installed full screen (html.pv-full), where the mockup draws it. Settings keep the prototype's own gear button +
+   bottom sheet. ---- */
 
-@media (max-width: 700px) {
-  html.pv body {
-    grid-template-columns: minmax(0, 1fr);
-    grid-auto-rows: max-content;
-    height: auto;
-    min-height: 100dvh;
-    padding: 8px;
-    overflow: auto;
-  }
+html.pv-app body {
+  display: block;
+  height: 100dvh;
+  padding: 0;
+  background: var(--pv-app-bg, var(--bg));
+}
 
-  .pv-stage { padding: 16px 8px; }
+html.pv-app .pv-stage {
+  position: fixed;
+  inset: 0;
+  display: block;
+  padding: 0;
+  border-radius: 0;
+  background: var(--pv-app-bg, var(--bg));
+  box-shadow: none;
+}
 
-  html.pv .fab { display: grid; }
+html.pv-app .pv-panel { display: none; }
 
-  html.pv #settings {
-    position: fixed;
-    width: auto;
-    max-height: 78vh;
-    align-self: auto;
-  }
+html.pv-app .wrap {
+  position: absolute !important;
+  left: var(--pv-app-x) !important;
+  top: var(--pv-app-y) !important;
+  overflow: hidden;
+}
 
-  .pv-panel { overflow: visible; }
-  .pv-list { overflow: visible; }
+html.pv-app .phone {
+  width: 360px;
+  height: 800px;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+html.pv-app:not(.pv-full) .phone { margin-top: -24px; }
+
+html.pv-app .device { border-radius: 0; }
+
+html.pv-app .cam,
+html.pv-app .hwb,
+html.pv-app:not(.pv-full) .gpill,
+html.pv-app:not(.pv-full) .sbar { display: none !important; }
+
+html.pv-app .fab { display: grid; }
+
+html.pv-app #settings {
+  position: fixed;
+  width: auto;
+  max-height: 78vh;
+  align-self: auto;
 }
 
 /* ---- One screen on its own (an All flows tile): just the screen, no bezel, no chrome ---- */
