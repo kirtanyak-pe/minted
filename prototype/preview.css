@@ -1,0 +1,425 @@
+/*
+ * The preview around the prototype — the Lemonn app's preview look (~/lemonn-app/src/preview): a dotted stage with the
+ * phone and its floating settings card, and the list of flows and screens beside it. Preview chrome only: nothing in
+ * here touches the screens inside the phone (styles.css / app.js stay as the teammate exported them).
+ * Colours are the L3 values the Lemonn preview renders with (dark: html[data-mode=dark], set by the prototype).
+ */
+
+:root {
+  --pv-bg: #f4f4f4;
+  --pv-surface: #ffffff;
+  --pv-line: #e8e8e8;
+  --pv-dot: #dbdbdb;
+  --pv-hover: #f4f4f4;
+  --pv-text: #161616;
+  --pv-text-2: rgb(22 22 22 / 60%);
+  --pv-text-3: rgb(22 22 22 / 40%);
+  --pv-inv-bg: #161616;
+  --pv-inv-text: #ffffff;
+  --pv-shadow: 0 0 16px rgb(0 0 0 / 18%);
+  --pv-font: Manrope, system-ui, sans-serif;
+  --pv-panel-width: 360px;
+}
+
+:root[data-mode='dark'] {
+  --pv-bg: #262626;
+  --pv-surface: #000000;
+  --pv-line: #262626;
+  --pv-dot: #525252;
+  --pv-hover: #262626;
+  --pv-text: #e8e8e8;
+  --pv-text-2: rgb(232 232 232 / 60%);
+  --pv-text-3: rgb(232 232 232 / 35%);
+  --pv-inv-bg: #e8e8e8;
+  --pv-inv-text: #000000;
+}
+
+/* ---- Layout: stage | panel ---- */
+
+html.pv body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--pv-panel-width);
+  grid-template-rows: minmax(0, 1fr);
+  align-items: stretch;
+  justify-content: stretch;
+  gap: 16px;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100dvh;
+  margin: 0;
+  padding: 16px;
+  overflow: hidden;
+  background: var(--pv-bg);
+  font-family: var(--pv-font);
+}
+
+.pv-stage {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 24px;
+  min-width: 0;
+  min-height: 0;
+  padding: 32px 16px;
+  overflow: clip;
+  border-radius: 24px;
+  background-color: var(--pv-surface);
+  background-image: radial-gradient(var(--pv-dot) 1px, transparent 1px);
+  background-size: 20px 20px;
+  box-shadow: inset 0 0 0 1px var(--pv-line);
+}
+
+/* The phone sits in the layout (the prototype's own fit() positioned it on the page). */
+html.pv .wrap {
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  flex: none;
+}
+
+/* ---- Device: the Lemonn preview's phone (near-black body, 12 bezel, thin rim, side buttons, punch-hole) ---- */
+
+html.pv .phone {
+  border-radius: 44px;
+  background: linear-gradient(rgb(255 255 255 / 10%), rgb(255 255 255 / 10%)), #000;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 30%), 0 0 0 2px rgb(255 255 255 / 15%), var(--pv-shadow);
+}
+
+html.pv .device {
+  border-radius: 32px;
+}
+
+html.pv .hwb {
+  right: -4px;
+  width: 4px;
+  border-radius: 0 2px 2px 0;
+  background: #000;
+  box-shadow: inset -1px 0 0 rgb(255 255 255 / 30%), 2px 0 0 rgb(255 255 255 / 15%);
+}
+
+html.pv .hwb.pw { top: 18%; height: 64px; }
+html.pv .hwb.vol { top: calc(18% + 80px); height: 96px; }
+
+html.pv .cam {
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #000;
+  box-shadow: inset 0 0 0 2px rgb(255 255 255 / 10%);
+}
+
+/* ---- The prototype's settings: a floating card beside the phone (the Lemonn preview's FloatingOptions) ---- */
+
+html.pv .fab { display: none; }
+
+html.pv #settings {
+  position: relative;
+  flex: none;
+  align-self: center;
+  box-sizing: border-box;
+  width: 280px;
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* Its own colours (the prototype's stage card): its controls are styled for them in light and dark. */
+  border: 1px solid var(--stage-line);
+  border-radius: 16px;
+  background: var(--stage-card);
+  box-shadow: var(--pv-shadow);
+}
+
+/* Its title and its own page list live in the panel now. */
+html.pv #settings > .ph,
+html.pv #settings > h2:has(+ #list),
+html.pv #settings > #list {
+  display: none;
+}
+
+/* ---- Panel ---- */
+
+.pv-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+  padding: 16px 0;
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--pv-surface);
+  box-shadow: inset 0 0 0 1px var(--pv-line);
+  color: var(--pv-text);
+  font: 500 14px/20px var(--pv-font);
+}
+
+.pv-panel button {
+  font-family: var(--pv-font);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pv-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 16px;
+}
+
+.pv-title {
+  margin: 0;
+  font: 750 16px/22px var(--pv-font);
+  color: var(--pv-text);
+}
+
+.pv-desc {
+  margin: 4px 0 0;
+  font: 500 12px/16px var(--pv-font);
+  color: var(--pv-text-2);
+}
+
+/* Segmented pills: the Light / Dark switch and the Phone / All flows views. */
+.pv-seg {
+  display: flex;
+  flex: none;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 999px;
+  background: var(--pv-hover);
+}
+
+.pv-seg button {
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--pv-text-2);
+  cursor: pointer;
+  transition: background-color 150ms cubic-bezier(0.2, 0, 0, 1), color 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.pv-seg button[aria-checked='true'] {
+  background: var(--pv-inv-bg);
+  color: var(--pv-inv-text);
+}
+
+.pv-modes button { width: 32px; height: 28px; padding: 0; }
+
+.pv-views { margin: 0 16px; }
+
+.pv-views button {
+  flex: 1;
+  height: 32px;
+  padding: 0 12px;
+  font: 650 14px/20px var(--pv-font);
+}
+
+.pv-list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 0;
+  padding: 12px 8px 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-top: 1px solid var(--pv-line);
+}
+
+.pv-flow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  padding: 8px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--pv-text);
+  font: 750 18px/24px var(--pv-font);
+  text-align: start;
+  cursor: pointer;
+}
+
+.pv-count {
+  font: 500 12px/16px var(--pv-font);
+  color: var(--pv-text-3);
+}
+
+.pv-chev {
+  display: inline-flex;
+  color: var(--pv-text-2);
+  transition: transform 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.pv-flow[aria-expanded='true'] .pv-chev { transform: rotate(180deg); }
+
+.pv-screens {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0 0 8px;
+  list-style: none;
+}
+
+.pv-screens[hidden] { display: none; }
+
+.pv-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--pv-text);
+  font: 500 14px/20px var(--pv-font);
+  text-align: start;
+  cursor: pointer;
+}
+
+.pv-item[aria-current] {
+  background: var(--pv-inv-bg);
+  color: var(--pv-inv-text);
+  font-weight: 650;
+}
+
+.pv-num {
+  color: var(--pv-text-3);
+  font: 650 12px/inherit var(--pv-font);
+  line-height: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+.pv-item[aria-current] .pv-num { color: inherit; }
+
+.pv-flow:focus-visible,
+.pv-item:focus-visible,
+.pv-seg button:focus-visible {
+  outline: 2px solid var(--pv-text);
+  outline-offset: -2px;
+}
+
+@media (hover: hover) {
+  .pv-flow:hover,
+  .pv-item:not([aria-current]):hover {
+    background: var(--pv-hover);
+  }
+}
+
+/* ---- All flows: every screen, flow by flow (each a live copy of the prototype opened on that screen) ---- */
+
+/* Flows sit side by side and wrap; each flow's screens in a row under its name. */
+.pv-all {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 32px 48px;
+  padding: 32px;
+  overflow: auto;
+}
+
+.pv-all[hidden] { display: none; }
+
+html.pv[data-view='all'] .pv-stage > :not(.pv-all) { visibility: hidden; }
+
+.pv-all h2 {
+  margin: 0 0 12px;
+  color: var(--pv-text);
+  font: 750 18px/24px var(--pv-font);
+}
+
+.pv-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.pv-shot {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--pv-text-2);
+  font: 500 12px/16px var(--pv-font);
+  text-align: start;
+  cursor: pointer;
+}
+
+.pv-shot-frame {
+  position: relative;
+  width: 180px;
+  height: 400px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #000;
+  box-shadow: inset 0 0 0 1px var(--pv-line), 0 0 0 2px var(--pv-line);
+}
+
+.pv-shot-frame iframe {
+  width: 360px;
+  height: 800px;
+  border: 0;
+  transform: scale(0.5);
+  transform-origin: top left;
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .pv-shot:hover { color: var(--pv-text); }
+  .pv-shot:hover .pv-shot-frame { box-shadow: inset 0 0 0 1px var(--pv-line), 0 0 0 2px var(--pv-text-3); }
+}
+
+/* ---- Narrow windows: the phone on top (scaled to the width), the list under it; settings keep the prototype's
+   own gear button + bottom sheet ---- */
+
+@media (max-width: 700px) {
+  html.pv body {
+    grid-template-columns: minmax(0, 1fr);
+    grid-auto-rows: max-content;
+    height: auto;
+    min-height: 100dvh;
+    padding: 8px;
+    overflow: auto;
+  }
+
+  .pv-stage { padding: 16px 8px; }
+
+  html.pv .fab { display: grid; }
+
+  html.pv #settings {
+    position: fixed;
+    width: auto;
+    max-height: 78vh;
+    align-self: auto;
+  }
+
+  .pv-panel { overflow: visible; }
+  .pv-list { overflow: visible; }
+}
+
+/* ---- One screen on its own (an All flows tile): just the screen, no bezel, no chrome ---- */
+
+html.pv-one body {
+  display: block;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #000;
+}
+
+html.pv-one .wrap { position: static !important; width: 360px !important; height: 800px !important; }
+html.pv-one .phone { padding: 0; border-radius: 0; background: none; box-shadow: none; transform: none !important; }
+html.pv-one .device { border-radius: 0; }
+html.pv-one .cam,
+html.pv-one .hwb,
+html.pv-one .fab,
+html.pv-one #settings { display: none !important; }

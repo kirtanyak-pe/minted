@@ -1,0 +1,159 @@
+/*
+ * The preview around the prototype (styles: preview.css) — the Lemonn app's preview layout: the phone on a dotted stage
+ * with the prototype's settings as a floating card beside it, and a panel listing every screen flow by flow (Light /
+ * Dark, Phone / All flows). Runs after app.js and only drives it from outside — the hidden #list buttons, the settings card's
+ * Appearance buttons, authSkipNow() — so the screens and their interactions stay exactly as exported.
+ * ?one=sNN opens a single screen without any chrome (the All flows tiles).
+ */
+(() => {
+  const FLOWS = [
+    ['Home', ['s01']],
+    ['Search', ['s02']],
+    ['Market', ['s03']],
+    ['Stock & ETF', ['s04', 's12']],
+    ['Orders', ['s05', 's13', 's14', 's15', 's06', 's16']],
+    ['Portfolio', ['s07', 's17', 's08']],
+    ['Wallet', ['s09', 's20', 's18', 's19']],
+    ['Profile', ['s10']],
+    ['Futures', ['s22']],
+    ['Options', ['s23']],
+  ]
+  const $ = (s, el = document) => el.querySelector(s)
+  const root = document.documentElement
+  const listBtn = (id) => $(`#list button[data-to="${id}"]`)
+  const open = (id) => {
+    if (window.authSkipNow) authSkipNow()
+    const b = listBtn(id)
+    if (b) b.click()
+  }
+
+  const one = new URLSearchParams(location.search).get('one')
+  if (one) {
+    root.classList.add('pv-one')
+    // No splash / sign-in: the prototype starts it a moment after loading, so it's switched off before then.
+    window.authStart = (done) => { if (done) done(); open(one) }
+    setTimeout(() => open(one), 0)
+    return
+  }
+  root.classList.add('pv')
+
+  // Screen names come from the prototype's own page list.
+  const names = {}
+  document.querySelectorAll('#list button[data-to]').forEach((b) => {
+    names[b.dataset.to] = [...b.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join('').trim()
+  })
+  const listed = new Set(FLOWS.flatMap((f) => f[1]))
+  const rest = Object.keys(names).filter((id) => !listed.has(id))
+  const flows = FLOWS.map(([n, ids]) => [n, ids.filter((id) => names[id])]).filter((f) => f[1].length)
+  if (rest.length) flows.push(['More', rest])
+
+  // ---- Stage: the phone + the settings card ----
+  const stage = document.createElement('main')
+  stage.className = 'pv-stage'
+  const wrap = $('#wrap'), phone = $('#phone'), settings = $('#settings')
+  document.body.insertBefore(stage, wrap)
+  stage.append(wrap, settings)
+
+  let all // the All flows view, built the first time it opens
+
+  // ---- Panel ----
+  const chev = '<span class="pv-chev"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>'
+  const sun = '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="currentColor"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+  const moon = '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="currentColor"/></svg>'
+  const panel = document.createElement('aside')
+  panel.className = 'pv-panel'
+  panel.setAttribute('aria-label', 'Flows and screens')
+  panel.innerHTML = `
+    <header class="pv-head">
+      <div><h1 class="pv-title">Minted</h1><p class="pv-desc">Every flow of Minted — US stocks, ETFs and perps.</p></div>
+      <div class="pv-seg pv-modes" role="radiogroup" aria-label="Mode">
+        <button type="button" role="radio" aria-label="Light" data-mode="light">${sun}</button>
+        <button type="button" role="radio" aria-label="Dark" data-mode="dark">${moon}</button>
+      </div>
+    </header>
+    <div class="pv-seg pv-views" role="radiogroup" aria-label="View">
+      <button type="button" role="radio" data-view="phone">Phone</button>
+      <button type="button" role="radio" data-view="all">All flows</button>
+    </div>
+    <nav class="pv-list">${flows.map(([n, ids], i) => `
+      <div class="pv-group">
+        <button type="button" class="pv-flow" aria-expanded="false" aria-controls="pv-f${i}"><span>${n}</span><span class="pv-count">${ids.length}</span>${chev}</button>
+        <ul class="pv-screens" id="pv-f${i}" hidden>${ids.map((id, j) => `
+          <li><button type="button" class="pv-item" data-id="${id}"><span class="pv-num">${String(j + 1).padStart(2, '0')}</span><span>${names[id]}</span></button></li>`).join('')}
+        </ul>
+      </div>`).join('')}
+    </nav>`
+  document.body.insertBefore(panel, stage.nextSibling)
+
+  panel.addEventListener('click', (e) => {
+    const f = e.target.closest('.pv-flow')
+    if (f) {
+      const on = f.getAttribute('aria-expanded') !== 'true'
+      f.setAttribute('aria-expanded', on)
+      $('#' + f.getAttribute('aria-controls')).hidden = !on
+      return
+    }
+    const it = e.target.closest('.pv-item')
+    if (it) { setView('phone'); open(it.dataset.id); return }
+    const m = e.target.closest('button[data-mode]')
+    if (m) { const a = $(`#modes [data-appearance="${m.dataset.mode}"]`); if (a) a.click(); return }
+    const v = e.target.closest('button[data-view]')
+    if (v) setView(v.dataset.view)
+  })
+
+  // The current screen: whichever page-list button the prototype marks .on. Its flow opens.
+  const current = () => {
+    const on = $('#list button.on')
+    const id = on && on.dataset.to
+    panel.querySelectorAll('.pv-item').forEach((b) => {
+      if (b.dataset.id === id) {
+        b.setAttribute('aria-current', 'page')
+        const f = b.closest('.pv-group').querySelector('.pv-flow')
+        if (f.getAttribute('aria-expanded') !== 'true') f.click()
+      } else b.removeAttribute('aria-current')
+    })
+  }
+  new MutationObserver(current).observe($('#list'), { subtree: true, attributes: true, attributeFilter: ['class'] })
+  current()
+
+  const mode = () => {
+    panel.querySelectorAll('[data-mode]').forEach((b) => b.setAttribute('aria-checked', b.dataset.mode === (root.dataset.mode || 'dark')))
+    // The All flows tiles follow (they read the mode from the address).
+    if (all) all.querySelectorAll('.pv-shot').forEach((s) => { $('iframe', s).src = `?one=${s.dataset.id}${location.hash}` })
+  }
+  new MutationObserver(mode).observe(root, { attributes: true, attributeFilter: ['data-mode'] })
+  mode()
+
+  // ---- All flows: one live tile per screen, built the first time it's opened ----
+  function setView(v) {
+    root.dataset.view = v
+    panel.querySelectorAll('[data-view]').forEach((b) => b.setAttribute('aria-checked', b.dataset.view === v))
+    if (v === 'all' && !all) {
+      all = document.createElement('div')
+      all.className = 'pv-all'
+      all.innerHTML = flows.map(([n, ids]) => `<section><h2>${n}</h2><div class="pv-row">${ids.map((id, j) => `
+        <button type="button" class="pv-shot" data-id="${id}"><span class="pv-shot-frame"><iframe loading="lazy" tabindex="-1" title="${names[id]}" src="?one=${id}${location.hash}"></iframe></span>${String(j + 1).padStart(2, '0')} · ${names[id]}</button>`).join('')}</div></section>`).join('')
+      all.addEventListener('click', (e) => { const s = e.target.closest('.pv-shot'); if (s) { setView('phone'); open(s.dataset.id) } })
+      stage.append(all)
+    }
+    if (all) all.hidden = v !== 'all'
+  }
+  setView('phone')
+
+  // ---- Fit: the phone scales to the stage (the prototype's fit() sized it to the window) ----
+  const PW = 384, PH = 824
+  function pvFit() {
+    const cs = getComputedStyle(stage)
+    const narrow = innerWidth <= 700
+    const w = stage.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - (narrow ? 0 : settings.offsetWidth + 24)
+    const h = stage.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)
+    const k = Math.min(1, w / PW, narrow ? Infinity : h / PH)
+    phone.style.transform = `scale(${k})`
+    wrap.style.width = PW * k + 'px'
+    wrap.style.height = PH * k + 'px'
+    settings.style.maxHeight = narrow ? '' : h + 'px'
+  }
+  addEventListener('resize', pvFit)
+  new ResizeObserver(pvFit).observe(stage)
+  pvFit()
+})()
