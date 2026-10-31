@@ -232,4 +232,34 @@
   addEventListener('resize', pvFit)
   new ResizeObserver(pvFit).observe(stage)
   pvFit()
+
+  // Auto update (user, 2026-11-01): on the published site, check version.json (written by scripts/deploy.sh) every
+  // minute; when a new deploy is out, fetch the page's files again past the browser cache and reload — the hash keeps
+  // the screen and theme. Not on localhost (Vite reloads itself) or inside the All flows tiles (the top page reloads them).
+  if (self === top && !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) {
+    const verUrl = () => new URL('version.json', document.baseURI).href + '?t=' + Date.now()
+    let current = null
+    let pressing = false
+    addEventListener('pointerdown', () => { pressing = true }, true)
+    addEventListener('pointerup', () => { pressing = false }, true)
+    addEventListener('pointercancel', () => { pressing = false }, true)
+    const update = async () => {
+      const files = [...document.querySelectorAll('script[src], link[rel="stylesheet"][href]')]
+        .map((e) => e.src || e.href).filter((u) => u.startsWith(location.origin))
+      await Promise.all([location.href.split('#')[0], ...files].map((u) => fetch(u, { cache: 'reload' }).catch(() => {})))
+      location.reload()
+    }
+    const check = async () => {
+      try {
+        const r = await fetch(verUrl(), { cache: 'no-store' })
+        if (!r.ok) return
+        const v = (await r.json()).version
+        if (current === null) current = v
+        else if (v && v !== current && !pressing) update()
+      } catch (e) {}
+    }
+    check()
+    setInterval(check, 60000)
+    document.addEventListener('visibilitychange', check)
+  }
 })()
