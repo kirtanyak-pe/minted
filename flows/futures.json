@@ -1,0 +1,20 @@
+{
+  "id": "futures",
+  "title": "Futures",
+  "description": "The Futures tab: perpetual futures on US stocks.",
+  "designSystem": {
+    "name": "Lemonnade V3 (L3)",
+    "commit": "cdf73c6",
+    "docs": "https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt"
+  },
+  "prototype": {
+    "flow": "https://kirtanyak-pe.github.io/minted/#/futures",
+    "screen": "https://kirtanyak-pe.github.io/minted/#/<screen-id>"
+  },
+  "screens": [],
+  "files": [
+    "src/flows/futures/README.md",
+    "src/flows/futures/index.tsx"
+  ],
+  "shared": []
+}

@@ -1,0 +1,20 @@
+{
+  "id": "options",
+  "title": "Options",
+  "description": "The Options tab.",
+  "designSystem": {
+    "name": "Lemonnade V3 (L3)",
+    "commit": "cdf73c6",
+    "docs": "https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt"
+  },
+  "prototype": {
+    "flow": "https://kirtanyak-pe.github.io/minted/#/options",
+    "screen": "https://kirtanyak-pe.github.io/minted/#/<screen-id>"
+  },
+  "screens": [],
+  "files": [
+    "src/flows/options/README.md",
+    "src/flows/options/index.tsx"
+  ],
+  "shared": []
+}

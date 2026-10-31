@@ -1,0 +1,20 @@
+{
+  "id": "market",
+  "title": "Market",
+  "description": "The Market tab: most traded, watchlist and new listings, every US asset with price and change.",
+  "designSystem": {
+    "name": "Lemonnade V3 (L3)",
+    "commit": "cdf73c6",
+    "docs": "https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt"
+  },
+  "prototype": {
+    "flow": "https://kirtanyak-pe.github.io/minted/#/market",
+    "screen": "https://kirtanyak-pe.github.io/minted/#/<screen-id>"
+  },
+  "screens": [],
+  "files": [
+    "src/flows/market/README.md",
+    "src/flows/market/index.tsx"
+  ],
+  "shared": []
+}

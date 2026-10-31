@@ -1,0 +1,20 @@
+{
+  "id": "asset",
+  "title": "Asset page",
+  "description": "A US stock or ETF: price, chart, stats, about — trade it spot or as a perp with leverage.",
+  "designSystem": {
+    "name": "Lemonnade V3 (L3)",
+    "commit": "cdf73c6",
+    "docs": "https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt"
+  },
+  "prototype": {
+    "flow": "https://kirtanyak-pe.github.io/minted/#/asset",
+    "screen": "https://kirtanyak-pe.github.io/minted/#/<screen-id>"
+  },
+  "screens": [],
+  "files": [
+    "src/flows/asset/README.md",
+    "src/flows/asset/index.tsx"
+  ],
+  "shared": []
+}

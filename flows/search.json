@@ -1,0 +1,20 @@
+{
+  "id": "search",
+  "title": "Search",
+  "description": "Search US stocks and ETFs.",
+  "designSystem": {
+    "name": "Lemonnade V3 (L3)",
+    "commit": "cdf73c6",
+    "docs": "https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt"
+  },
+  "prototype": {
+    "flow": "https://kirtanyak-pe.github.io/minted/#/search",
+    "screen": "https://kirtanyak-pe.github.io/minted/#/<screen-id>"
+  },
+  "screens": [],
+  "files": [
+    "src/flows/search/README.md",
+    "src/flows/search/index.tsx"
+  ],
+  "shared": []
+}

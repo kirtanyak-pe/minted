@@ -1,0 +1,23 @@
+# Minted · L3
+
+> The Minted app (US market: tokenised stocks, ETFs, perps) built flow by flow with the Lemonnade V3 (L3) design system (@ `cdf73c6`). Each flow below is ONE self-contained markdown file — spec, screens, navigation and all its source — written so an AI agent can convert it to Flutter, iOS or web.
+
+Start with [CONVERT.md](https://kirtanyak-pe.github.io/minted/CONVERT.md) (how to convert a flow), then open the flow you were given.
+
+## Flows
+
+- [Sign in](https://kirtanyak-pe.github.io/minted/flows/onboarding.md): Splash, terms, mobile number, OTP, PIN and biometrics — the way into Minted. — 0 screens · [json](https://kirtanyak-pe.github.io/minted/flows/onboarding.json) · [prototype](https://kirtanyak-pe.github.io/minted/#/onboarding)
+- [Home](https://kirtanyak-pe.github.io/minted/flows/home.md): The Home tab: wallet balance, quick actions, start trading, global ETFs, movers, categories, announcements. — 0 screens · [json](https://kirtanyak-pe.github.io/minted/flows/home.json) · [prototype](https://kirtanyak-pe.github.io/minted/#/home)
+- [Search](https://kirtanyak-pe.github.io/minted/flows/search.md): Search US stocks and ETFs. — 0 screens · [json](https://kirtanyak-pe.github.io/minted/flows/search.json) · [prototype](https://kirtanyak-pe.github.io/minted/#/search)
+- [Market](https://kirtanyak-pe.github.io/minted/flows/market.md): The Market tab: most traded, watchlist and new listings, every US asset with price and change. — 0 screens · [json](https://kirtanyak-pe.github.io/minted/flows/market.json) · [prototype](https://kirtanyak-pe.github.io/minted/#/market)
+- [Asset page](https://kirtanyak-pe.github.io/minted/flows/asset.md): A US stock or ETF: price, chart, stats, about — trade it spot or as a perp with leverage. — 0 screens · [json](https://kirtanyak-pe.github.io/minted/flows/asset.json) · [prototype](https://kirtanyak-pe.github.io/minted/#/asset)
+- [Order](https://kirtanyak-pe.github.io/minted/flows/order.md): Order pads (buy, sell, limit, SIP), leverage acknowledgement and quiz, processing, placed and failed. — 0 screens · [json](https://kirtanyak-pe.github.io/minted/flows/order.json) · [prototype](https://kirtanyak-pe.github.io/minted/#/order)
+- [Portfolio](https://kirtanyak-pe.github.io/minted/flows/portfolio.md): The Portfolio tab: US markets P&L, holdings and futures positions, empty state, orders and history. — 0 screens · [json](https://kirtanyak-pe.github.io/minted/flows/portfolio.json) · [prototype](https://kirtanyak-pe.github.io/minted/#/portfolio)
+- [Wallet](https://kirtanyak-pe.github.io/minted/flows/wallet.md): INR wallet: balance, dividends, withdraw. — 0 screens · [json](https://kirtanyak-pe.github.io/minted/flows/wallet.json) · [prototype](https://kirtanyak-pe.github.io/minted/#/wallet)
+- [Profile](https://kirtanyak-pe.github.io/minted/flows/profile.md): Profile and settings. — 0 screens · [json](https://kirtanyak-pe.github.io/minted/flows/profile.json) · [prototype](https://kirtanyak-pe.github.io/minted/#/profile)
+- [Futures](https://kirtanyak-pe.github.io/minted/flows/futures.md): The Futures tab: perpetual futures on US stocks. — 0 screens · [json](https://kirtanyak-pe.github.io/minted/flows/futures.json) · [prototype](https://kirtanyak-pe.github.io/minted/#/futures)
+- [Options](https://kirtanyak-pe.github.io/minted/flows/options.md): The Options tab. — 0 screens · [json](https://kirtanyak-pe.github.io/minted/flows/options.json) · [prototype](https://kirtanyak-pe.github.io/minted/#/options)
+
+## Design system
+
+- [Lemonnade V3 for agents](https://kirtanyak-pe.github.io/lemonnade-v3-docs/llms.txt): every component, prop, token and rule the flows use.
