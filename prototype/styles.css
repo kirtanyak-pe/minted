@@ -181,7 +181,7 @@ html,body{height:100%}
 body{font-family:var(--font);background:var(--stage);color:var(--stage-text);display:flex;align-items:center;justify-content:center;gap:40px;padding:24px;overflow:hidden}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .wrap{flex:none;position:relative}
-.device{position:relative;width:360px;height:800px;background:var(--bg);border-radius:38px;overflow:hidden;transform:translateZ(0)}
+.device{position:relative;width:360px;height:800px;background:var(--bg);border-radius:38px;overflow:hidden;transform:translateZ(0);clip-path:inset(0 round 38px)}   /* clip-path: sliding pages are on their own layers, which overflow + radius alone doesn't clip */
 /* Android phone mockup (Pixel-style: flat frame, centred punch-hole, gesture bar, right-side power + volume) */
 .phone{position:relative;width:384px;height:824px;padding:12px;border-radius:50px;background:linear-gradient(150deg,var(--c2e3230) 0%,var(--c121413) 35%,var(--c0b0c0c) 70%,var(--c222624) 100%);box-shadow:inset 0 0 0 1.5px #3b403d,inset 0 0 0 5px #070808,0 0 0 1px rgba(0,0,0,.35),0 40px 80px -24px rgba(0,0,0,.55);transform-origin:top left}
 .cam{position:absolute;left:186px;top:21px;width:12px;height:12px;border-radius:50%;background:#050607;background-image:radial-gradient(circle at 38% 38%,#2f4256 0,#2f4256 2px,transparent 3px);box-shadow:0 0 0 1.5px #1a1d1c;z-index:40;pointer-events:none}
@@ -226,7 +226,11 @@ svg.ic[style*="height:0px"]{height:1px!important}
 .hs{border-radius:8px;z-index:5}
 .hs:focus-visible{outline:2px solid var(--lime);outline-offset:1px}
 .flash .hs,.showhs .hs{background:var(--hot);box-shadow:inset 0 0 0 1px var(--lime)}
-.sbar{position:absolute;left:0;top:0;width:360px;height:24px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;color:var(--text);font:600 12px/16px var(--font);z-index:4;pointer-events:none}
+.sbar{position:absolute;left:0;top:0;width:360px;height:32px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;color:var(--text);z-index:4;pointer-events:none}
+/* L3 System statusbar glyphs: 18px time box, 18px wifi / signal / battery, 4px apart */
+.l3sb-time{display:block;height:18px;width:auto}
+.l3sb-icons{display:flex;align-items:center;gap:4px}
+.l3sb-glyph{display:block;width:18px;height:18px}
 .kb{position:absolute;left:0;width:360px;background:var(--c0f1014);box-shadow:0 -4px 16px rgba(0,0,0,.25);padding:10px 4px 0;display:flex;flex-direction:column;gap:9px;font-family:Roboto,var(--font)}
 .kb div{display:flex;justify-content:center;gap:5px}
 .kb span{flex:0 0 31px;height:40px;border-radius:6px;background:var(--c2b2d33);color:var(--ce8eaed);display:grid;place-items:center;font-size:18px}
@@ -675,7 +679,7 @@ ol button.on{background:var(--stage)}
 /* auth overlay */
 .auth{position:absolute;inset:0;z-index:60;background:var(--bg);color:var(--text);font-family:var(--font);overflow:hidden;transition:opacity .28s ease-out}
 .auth.out{opacity:0}
-.au-sb{display:flex;justify-content:space-between;padding:10px 16px 0;font:600 12px/16px var(--font);color:var(--text)}
+.au-sb{display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;height:32px;margin-bottom:-6px;padding:0 16px;color:var(--text)}   /* L3 statusbar; -6px keeps the sign-in layout where the old 26px bar left it */
 .au-top{display:flex;justify-content:space-between;align-items:center;height:40px;padding:8px 16px 0}
 .au-help,.au-back{font:600 12px/16px var(--font);color:var(--text)}.au-back{font-size:20px}
 .au-body{padding:24px 16px 0}.au-body h1{margin:0;font:700 18px/24px var(--font);color:var(--text)}

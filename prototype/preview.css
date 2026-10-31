@@ -88,6 +88,7 @@ html.pv .phone {
 
 html.pv .device {
   border-radius: 32px;
+  clip-path: inset(0 round 32px);
 }
 
 html.pv .hwb {
@@ -429,7 +430,7 @@ html.pv-app #groW .c { height: var(--pv-app-h, 800px) !important; }
 
 html.pv-app .fixed.bottom { top: var(--pv-app-shift, 0px); }
 
-html.pv-app .device { border-radius: 0; }
+html.pv-app .device { border-radius: 0; clip-path: none; }
 
 html.pv-app .cam,
 html.pv-app .hwb,
@@ -460,8 +461,13 @@ html.pv-one body {
 
 html.pv-one .wrap { position: static !important; width: 360px !important; height: 800px !important; }
 html.pv-one .phone { padding: 0; border-radius: 0; background: none; box-shadow: none; transform: none !important; }
-html.pv-one .device { border-radius: 0; }
+html.pv-one .device { border-radius: 0; clip-path: none; }
 html.pv-one .cam,
 html.pv-one .hwb,
 html.pv-one .fab,
 html.pv-one #settings { display: none !important; }
+
+/* ---- The prototype's settings card is archived (user, 2026-10-31): still in the page, just not shown. Delete this
+   rule to bring it back. ---- */
+html.pv #settings,
+html.pv .fab { display: none !important; }

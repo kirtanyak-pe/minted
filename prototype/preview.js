@@ -3,10 +3,15 @@
  * with the prototype's settings as a floating card beside it, and a panel listing every screen flow by flow (Light /
  * Dark, Phone / All flows). Runs after app.js and only drives it from outside — the hidden #list buttons, the settings card's
  * Appearance buttons, authSkipNow() — so the screens and their interactions stay exactly as exported.
- * ?one=sNN opens a single screen without any chrome (the All flows tiles).
+ * ?one=sNN opens a single screen without any chrome (the All flows tiles). The sign-in steps aren't screens (app.js draws
+ * them in #auth); they open through authShow() and are listed as au-* ids.
  */
 (() => {
+  // Sign-in steps: [panel id, name, app.js step]
+  const AUTH = [['au-splash', 'Splash', 'splash'], ['au-login', 'Sign in', 'login'], ['au-tnc', 'Terms & consent', 'tnc'],
+    ['au-otp', 'OTP', 'otp2'], ['au-bio', 'Biometrics', 'bio'], ['au-pin', 'PIN · returning user', 'pin']]
   const FLOWS = [
+    ['Login', AUTH.map((a) => a[0])],
     ['Home', ['s01']],
     ['Search', ['s02']],
     ['Market', ['s03']],
@@ -22,9 +27,14 @@
   const root = document.documentElement
   const listBtn = (id) => $(`#list button[data-to="${id}"]`)
   const open = (id) => {
+    const a = AUTH.find((x) => x[0] === id)
+    if (a && window.authShow) { authShow(a[2]); return }
     if (window.authSkipNow) authSkipNow()
     const b = listBtn(id)
-    if (b) b.click()
+    if (b) { b.click(); return }
+    // Not in the prototype's page list (e.g. Orderpad · SIP): open a listed screen that links to it, then follow the link.
+    const link = [...document.querySelectorAll(`.screen [data-to="${id}"]`)].find((l) => listBtn(l.closest('.screen').id))
+    if (link) { listBtn(link.closest('.screen').id).click(); link.click() }
   }
 
   const one = new URLSearchParams(location.search).get('one')
@@ -42,6 +52,8 @@
   document.querySelectorAll('#list button[data-to]').forEach((b) => {
     names[b.dataset.to] = [...b.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join('').trim()
   })
+  document.querySelectorAll('#device .screen[data-name]').forEach((s) => { if (!names[s.id]) names[s.id] = s.dataset.name })
+  AUTH.forEach(([id, n]) => { names[id] = n })
   const listed = new Set(FLOWS.flatMap((f) => f[1]))
   const rest = Object.keys(names).filter((id) => !listed.has(id))
   const flows = FLOWS.map(([n, ids]) => [n, ids.filter((id) => names[id])]).filter((f) => f[1].length)
@@ -101,10 +113,12 @@
     if (v) setView(v.dataset.view)
   })
 
-  // The current screen: whichever page-list button the prototype marks .on. Its flow opens.
+  // The current screen: the sign-in step on show, else the screen marked .on (watched through the page list's .on). Its flow opens.
+  const auth = $('#auth')
   const current = () => {
-    const on = $('#list button.on')
-    const id = on && on.dataset.to
+    const on = $('#device .screen.on')
+    const step = auth && !auth.hidden && AUTH.find((x) => x[2] === auth.dataset.s || (x[0] === 'au-otp' && auth.dataset.s === 'otp'))
+    const id = step ? step[0] : on && on.id
     panel.querySelectorAll('.pv-item').forEach((b) => {
       if (b.dataset.id === id) {
         b.setAttribute('aria-current', 'page')
@@ -114,6 +128,7 @@
     })
   }
   new MutationObserver(current).observe($('#list'), { subtree: true, attributes: true, attributeFilter: ['class'] })
+  if (auth) new MutationObserver(current).observe(auth, { attributes: true, attributeFilter: ['hidden', 'data-s'] })
   current()
 
   const mode = () => {
@@ -185,7 +200,7 @@
     root.classList.toggle('pv-app', app)
     if (app) { appFit(); return }
     const cs = getComputedStyle(stage)
-    const w = stage.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - settings.offsetWidth - 24
+    const w = stage.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - (settings.offsetWidth ? settings.offsetWidth + 24 : 0)
     const h = stage.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)
     const k = Math.min(1, w / PW, h / PH)
     phone.style.transform = `scale(${k})`
