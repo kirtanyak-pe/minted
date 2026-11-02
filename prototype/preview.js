@@ -233,33 +233,46 @@
   new ResizeObserver(pvFit).observe(stage)
   pvFit()
 
-  // Auto update (user, 2026-11-01): on the published site, check version.json (written by scripts/deploy.sh) every
-  // minute; when a new deploy is out, fetch the page's files again past the browser cache and reload — the hash keeps
-  // the screen and theme. Not on localhost (Vite reloads itself) or inside the All flows tiles (the top page reloads them).
-  if (self === top && !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) {
-    const verUrl = () => new URL('version.json', document.baseURI).href + '?t=' + Date.now()
-    let current = null
-    let pressing = false
-    addEventListener('pointerdown', () => { pressing = true }, true)
-    addEventListener('pointerup', () => { pressing = false }, true)
-    addEventListener('pointercancel', () => { pressing = false }, true)
-    const update = async () => {
-      const files = [...document.querySelectorAll('script[src], link[rel="stylesheet"][href]')]
-        .map((e) => e.src || e.href).filter((u) => u.startsWith(location.origin))
-      await Promise.all([location.href.split('#')[0], ...files].map((u) => fetch(u, { cache: 'reload' }).catch(() => {})))
-      location.reload()
+  // Auto update (user, 2026-11-01): the build bakes its id into the page (<meta name="build-id">) and publishes it as
+  // version.json (vite.config.ts, versionFile). Every minute, and when the tab comes back, fetch version.json past every
+  // cache; if it differs from this page's own id, clear Cache Storage and reload at ?reload=<id> — a new address the
+  // browser has no cached copy of — keeping the hash (screen and theme). Comparing against the baked id means a page
+  // served from an old cache still notices. One try per id (sessionStorage), so a lagging CDN can't loop. Off on
+  // localhost (Vite reloads itself), in dev (no build id) and inside the All flows tiles (the top page reloads them).
+  {
+    const MARK = 'reload'
+    const TRIED = 'auto-update:tried'
+    const url = new URL(location.href)
+    if (url.searchParams.has(MARK)) {
+      url.searchParams.delete(MARK)
+      history.replaceState(history.state, '', url.href)
     }
-    const check = async () => {
-      try {
-        const r = await fetch(verUrl(), { cache: 'no-store' })
-        if (!r.ok) return
-        const v = (await r.json()).version
-        if (current === null) current = v
-        else if (v && v !== current && !pressing) update()
-      } catch (e) {}
+    const own = document.querySelector('meta[name="build-id"]')?.content
+    if (own && self === top && !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) {
+      let pressing = false
+      addEventListener('pointerdown', () => { pressing = true }, true)
+      addEventListener('pointerup', () => { pressing = false }, true)
+      addEventListener('pointercancel', () => { pressing = false }, true)
+      const tried = (v) => { try { return sessionStorage.getItem(TRIED) === v } catch (e) { return false } }
+      const reloadFresh = async (v) => {
+        try { sessionStorage.setItem(TRIED, v) } catch (e) {}
+        try { if ('caches' in window) await Promise.all((await caches.keys()).map((k) => caches.delete(k))) } catch (e) {}
+        const next = new URL(location.href)
+        next.searchParams.set(MARK, v)
+        location.replace(next.href)
+      }
+      const check = async () => {
+        if (document.visibilityState !== 'visible' || pressing) return
+        try {
+          const r = await fetch(new URL('version.json?t=' + Date.now(), document.baseURI), { cache: 'no-store' })
+          if (!r.ok) return
+          const v = (await r.json()).version
+          if (v && v !== own && !tried(v)) await reloadFresh(v)
+        } catch (e) {}
+      }
+      check()
+      setInterval(check, 60000)
+      document.addEventListener('visibilitychange', check)
     }
-    check()
-    setInterval(check, 60000)
-    document.addEventListener('visibilitychange', check)
   }
 })()

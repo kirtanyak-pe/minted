@@ -783,7 +783,7 @@ screens.forEach(s=>{
   if(s.dataset.sb) s.insertAdjacentHTML('beforeend',SB);
   if(s.dataset.kb){const t=+s.dataset.kb;s.insertAdjacentHTML('beforeend',`<div class="kb" style="top:${t}px;height:${776-t}px" aria-hidden="true">${row('qwertyuiop'.split(''))}${row('asdfghjkl'.split(''))}${row(['~w ⇧'].concat('zxcvbnm'.split(''),['~w ⌫']))}${row(['~w ?123','~w ☺','~sp ','.','~go ✓'])}</div>`);}
 });
-function show(){const id=stack[stack.length-1];const el=document.getElementById(id);if(el&&el._amt&&!el._kept){el._amt.value='';validate(el);if(el._open)el._open(true);}if(id==='s02'){setTimeout(()=>sIn.focus(),60);}if(id==='s18'){wamt='100';wUpd();}screens.forEach(s=>{const on=s.id===id;s.classList.toggle('on',on);if(on){const sc=s.querySelector('.scroll');if(sc)sc.scrollTop=0;}});
+function show(){const id=stack[stack.length-1];const el=document.getElementById(id);if(el&&el._amt&&!el._kept){el._amt.value='';validate(el);if(el._open)el._open(true);}if(id==='s02'){setTimeout(()=>sIn.focus({preventScroll:true}),380);}   /* after the page has slid in; focusing mid-slide scrolled the phone sideways (user, 2026-11-01) */if(id==='s18'){wamt='100';wUpd();}screens.forEach(s=>{const on=s.id===id;s.classList.toggle('on',on);if(on){const sc=s.querySelector('.scroll');if(sc)sc.scrollTop=0;}});
   document.querySelectorAll('#list button').forEach(b=>b.classList.toggle('on',b.dataset.to===id));}
 function go(to){const from=stack[stack.length-1],n=stack.length;if(to==='back'){if(stack.length>1)stack.pop();}else if(document.getElementById(to)&&stack[stack.length-1]!==to)stack.push(to);show();
  const now=stack[stack.length-1];if(now!==from&&stack.length!==n&&!(NAVTABS.includes(from)&&NAVTABS.includes(now)))pageSlide(from,now,stack.length>n?'push':'back');}
@@ -2070,6 +2070,17 @@ kit.scene('d3-draw', {
 const MINT_SVG=(cls='')=>`<svg class="mt-logo ${cls}" viewBox="-6 -36 1200 226" aria-label="Minted"><g class="mt-mark" fill="none" stroke="currentColor" stroke-width="17.1" stroke-miterlimit="10"><path class="mk1" d="M91 8.55H173.55V173.55H8.55V8.55Z"/><path class="mk2" d="M106.55 0V109A33.45 33.45 0 1 1 73.1 75.55"/><path class="mk3" d="M73.1 75.55H182.1"/></g><g class="mt-word" fill="currentColor"><path d="M 227.9 34L243.5 34L243.8 58.9C249.2 50.3 256.1 43.6 264.5 38.9C272.9 34.2 282.3 31.9 292.7 31.9C305.5 31.9 316.4 34.8 325.5 40.7C334.6 46.6 341.2 55 345.2 65.8C350.6 55 358.1 46.6 367.7 40.7C377.3 34.8 388 31.9 399.8 31.9C418.4 31.9 433 37.5 443.6 48.8C454.2 60.1 459.5 75.8 459.5 95.8L459.5 182.2L442.4 182.2L442.4 97C442.4 81.2 438.7 69 431.3 60.5C423.9 52 413.3 47.8 399.5 47.8C390.5 47.8 382.4 50 375.2 54.4C368 58.8 362.3 64.9 358.2 72.7C354.1 80.5 352.1 89.3 352.1 99.1L352.1 182.2L335 182.2L335 97C335 81.2 331.3 69 323.9 60.5C316.5 52 305.9 47.8 292.1 47.8C283.1 47.8 275 50 267.8 54.4C260.6 58.8 255 64.9 251 72.7C247 80.5 245 89.3 245 99.1L245 182.2L227.9 182.2ZM227.9 34"/><path d="M 505.1 34L522.2 34L522.2 182.2L505.1 182.2ZM503.9 -21.1C506.5 -23.6 509.7 -24.8 513.5 -24.8C517.5 -24.8 520.8 -23.6 523.4 -21.1C526 -18.6 527.3 -15.4 527.3 -11.6C527.3 -7.6 526 -4.4 523.4 -1.9C520.8 0.6 517.5 1.9 513.5 1.9C509.7 1.9 506.5 0.6 503.9 -2C501.3 -4.6 500 -7.8 500 -11.6C500 -15.4 501.3 -18.6 503.9 -21.1"/><path d="M 569.9 34L585.5 34L585.8 60.7C591.6 51.7 599.5 44.6 609.5 39.5C619.5 34.4 630.5 31.9 642.5 31.9C662.1 31.9 677.4 37.7 688.5 49.3C699.6 60.9 705.2 77 705.2 97.6L705.2 182.2L688.1 182.2L688.1 98.5C688.1 82.1 684 69.5 675.8 60.8C667.6 52.1 655.9 47.8 640.7 47.8C630.3 47.8 621 50.1 612.8 54.7C604.6 59.3 598.2 65.6 593.7 73.7C589.2 81.8 587 90.9 587 100.9L587 182.2L569.9 182.2ZM569.9 34"/><path d="M 777.5 172.7C770.9 164.6 767.6 152.5 767.6 136.3L767.6 49.3L736.4 49.3L736.4 34L767.6 34L767.6 -8.6L784.4 -10.4L784.4 34L833.9 34L833.9 49.3L784.4 49.3L784.4 136.3C784.4 147.1 786.3 155.3 790.1 160.9C793.9 166.5 800.8 169.3 810.8 169.3C814.2 169.3 818.1 168.6 822.5 167.3C826.9 166 831 164.5 834.8 162.7L840.5 177.1C829.7 182.3 819.5 184.9 809.9 184.9C794.9 184.9 784.1 180.8 777.5 172.7"/><path d="M 990.8 99.7C990.6 83.9 985.2 71.1 974.6 61.4C964 51.7 950.1 46.9 932.9 46.9C916.7 46.9 903.4 51.6 893.1 61.1C882.8 70.6 876.9 83.5 875.3 99.7ZM894.3 175.6C882.8 169 873.9 159.8 867.5 148.1C861.1 136.4 857.9 123.1 857.9 108.1C857.9 93.3 861 80 867.3 68.3C873.6 56.6 882.4 47.5 893.7 41C905 34.5 918 31.3 932.6 31.3C947.8 31.3 961 34.3 972.3 40.4C983.6 46.5 992.3 55.2 998.4 66.4C1004.5 77.6 1007.6 90.6 1007.6 105.4C1007.6 109.6 1007.5 112.7 1007.3 114.7L875.3 114.7C876.7 131.5 882.6 144.8 893.1 154.6C903.6 164.4 917.3 169.3 934.1 169.3C944.5 169.3 954.5 167.3 964.1 163.3C973.7 159.3 981 154 986 147.4L997.7 157.6C990.7 166.4 981.5 173.2 970.2 178.1C958.9 183 946.8 185.5 933.8 185.5C919 185.5 905.8 182.2 894.3 175.6"/><path d="M 1058 139.9C1063 149.1 1069.9 156.2 1078.8 161.3C1087.7 166.4 1097.9 169 1109.3 169C1120.7 169 1130.8 166.4 1139.6 161.3C1148.4 156.2 1155.3 149.1 1160.3 139.9C1165.3 130.7 1167.8 120.1 1167.8 108.1C1167.8 96.1 1165.3 85.5 1160.3 76.3C1155.3 67.1 1148.4 59.9 1139.6 54.8C1130.8 49.7 1120.7 47.2 1109.3 47.2C1097.9 47.2 1087.7 49.7 1078.8 54.8C1069.9 59.9 1063 67.1 1058 76.3C1053 85.5 1050.5 96.1 1050.5 108.1C1050.5 120.1 1053 130.7 1058 139.9M1069.2 175.1C1057.9 168.6 1049.1 159.6 1042.8 148C1036.5 136.4 1033.4 123.1 1033.4 108.1C1033.4 93.1 1036.5 79.8 1042.8 68.2C1049.1 56.6 1057.9 47.5 1069.2 41C1080.5 34.5 1093.3 31.3 1107.5 31.3C1120.7 31.3 1132.6 34 1143.2 39.4C1153.8 44.8 1162 52.2 1167.8 61.6L1167.8 -27.8L1184.9 -27.8L1184.9 182.2L1169.3 182.2L1169 152.8C1163.4 162.6 1155.1 170.4 1144.2 176.2C1133.3 182 1121.1 184.9 1107.5 184.9C1093.3 184.9 1080.5 181.6 1069.2 175.1"/></g></svg>`;   /* new Minted mark + outlined wordmark (from the 3D film artifact) */
 const MINT_MARK=()=>`<svg class="mt-markonly" viewBox="-6 -6 194 194" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="17.1"><path d="M91 8.55H173.55V173.55H8.55V8.55Z"/><path d="M106.55 0V109A33.45 33.45 0 1 1 73.1 75.55H182.1"/></g></svg>`;
 const AUTH={splash:'s5',mode:'otp',num:'',otp:'',pin:'',done:null};
+// OTP resend + limits (user, 2026-11-01): Resend unlocks after 30 s, 3 resends at most; 3 wrong codes lock the OTP.
+const OTP_WAIT=30,OTP_TRIES=3,OTP_RESENDS=3;
+const otpReset=()=>{AUTH.otp='';AUTH.err=false;AUTH.tries=0;AUTH.rsN=0;AUTH.lock=false;AUTH.rsAt=Date.now()+OTP_WAIT*1000;};
+const otpLeft=()=>Math.max(0,Math.ceil(((AUTH.rsAt||0)-Date.now())/1000));
+const otpRs=v1=>{const q=v1?'Didn’t receive OTP?':'Didn’t receive the code?';
+ if(AUTH.lock)return '<span class="o2e">Too many incorrect attempts. Try again after 30 minutes.</span>';
+ if(AUTH.rsN>=OTP_RESENDS)return 'Resend limit reached. Try again after 30 minutes.';
+ const t=otpLeft();if(t)return `${q} Resend in <span class="rs-t">0:${String(t).padStart(2,'0')}</span>`;
+ return `${q} <b data-rs role="button">Resend${v1?' OTP':''}</b>${v1?' • <b>OTP on Call</b>':''}`;};
+const otpWrong=()=>{AUTH.tries=(AUTH.tries||0)+1;if(AUTH.tries>=OTP_TRIES)AUTH.lock=true;};
+const otpWrongMsg=()=>{const n=OTP_TRIES-(AUTH.tries||0);return AUTH.lock?'Too many incorrect attempts':`Incorrect OTP. ${n} attempt${n===1?'':'s'} left`;};
 (()=>{const dv=document.getElementById('device');const el=document.createElement('div');el.id='auth';el.className='auth';el.hidden=true;dv.appendChild(el);
  const keypad=()=>`<div class="au-kp">${[1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(k=>k===''?'<i></i>':`<button data-k="${k}" aria-label="${k==='⌫'?'Delete':k}">${k==='⌫'?'<svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true"><path d="M7 1h13a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H7L1 8z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 5l6 6M16 5l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>':k}</button>`).join('')}</div>`;
  const sb='<div class="au-sb" aria-hidden="true">'+SBI+'</div>';
@@ -2089,29 +2100,48 @@ const AUTH={splash:'s5',mode:'otp',num:'',otp:'',pin:'',done:null};
   otp:()=>`${sb}<div class="au-top"><button class="au-back" data-go="login" aria-label="Back">←</button><button class="au-help">Help</button></div><div class="au-body"><h1>OTP Verification</h1><p class="au-sub">Please enter the 6-digit OTP sent to your registered email or</p>
    <p class="au-ph">+91 ${fmtNum(AUTH.num||'9846098460')} <button class="au-edit" data-go="login" aria-label="Edit number">✎</button></p>
    <p class="au-big ${AUTH.otp?'':'ph'}">${AUTH.otp||'000000'}<i class="au-caret"></i></p>
-   <p class="au-rs">Didn’t receive OTP? <b>Resend OTP</b> • <b>OTP on Call</b></p><p class="au-hint">Prototype: any 6 digits work · 000000 shows the error</p></div>
-   ${AUTH.err?'<div class="au-err"><i>!</i>Incorrect OTP. Please try again<button data-x="err" aria-label="Dismiss">✕</button></div>':''}
-   <div class="au-foot"><button class="au-cta l3-btn" data-variant="brand" data-size="lg" data-go="verify" ${AUTH.otp.length===6?'':'disabled'}>Verify OTP</button></div>${keypad()}`,
+   <p class="au-rs">${otpRs(1)}</p><p class="au-hint">Prototype: any 6 digits work · 000000 is wrong (3 wrong locks it)</p></div>
+   ${AUTH.err?'<div class="au-err"><i>!</i>'+otpWrongMsg()+'<button data-x="err" aria-label="Dismiss">✕</button></div>':''}
+   ${keypad()}`,   /* no Verify button: the 6th digit verifies (user, 2026-11-01) */
   otp2:()=>{const o=AUTH.otp,n=o.length;const bx=[0,1,2,3,4,5].map(i=>`<span class="ob ${i<n?'f':''} ${i===n?'cur':''}" style="--i:${i};--dx:${(140-(i*48+20))}px">${o[i]||''}</span>`).join('');
-   return V.login()+`<div class="au-scrim o2s"></div><div class="o2 ${AUTH.err?'bad':''}"><i class="au-grab"></i><h2 class="o2t">Let’s verify your number</h2><h2 class="o2t2">Verified successfully</h2>
+   return V.login()+`<div class="au-scrim o2s"></div><div class="o2 ${AUTH.err?'bad':''} ${AUTH.lock?'lock':''}"><i class="au-grab"></i><h2 class="o2t">Let’s verify your number</h2><h2 class="o2t2">Verified successfully</h2>
    <p class="o2s1">We’ve sent a 6-digit code to +91 ${fmtNum(AUTH.num||'9846098460')}.</p>
    <div class="o2row">${bx}<span class="o2ok"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9"/></svg></span></div>
-   <p class="o2rs">${AUTH.err?'<span class="o2e">Incorrect code. Please try again.</span>':'Didn’t receive the code? <b>Resend</b>'}</p>
-   <button class="au-cta o2v l3-btn" data-variant="brand" data-size="lg" data-go="verify2" ${n===6?'':'disabled'}>Verify OTP</button></div>`;},
+   <p class="o2rs">${AUTH.err?`<span class="o2e">${otpWrongMsg()}</span>`:otpRs(0)}</p></div>`;},   /* no Verify button: the 6th digit verifies (user, 2026-11-01) */
   bio:()=>`${sb}<div class="au-bio"><h1>Enable Biometrics?</h1><p class="au-sub">Secure your account with biometric access</p><svg class="au-bio-ic" width="96" height="96" viewBox="0 0 96 96" aria-hidden="true"><path d="M48.1832 22.4991C54.4053 22.4991 60.1415 23.8325 65.3915 26.4991C70.6415 29.1658 75.0998 32.9991 78.7665 37.9991L77.5998 39.1658C74.0998 34.277 69.836 30.5546 64.8082 27.9991C59.7803 25.4436 54.2387 24.1658 48.1832 24.1658C42.2943 24.1658 36.8637 25.4296 31.8915 27.9575C26.9193 30.4853 22.5998 34.1936 18.9332 39.0825L17.6832 38.3325C21.2387 33.2213 25.6553 29.3046 30.9332 26.5825C36.211 23.8602 41.961 22.4991 48.1832 22.4991ZM48.1832 30.4991C55.8498 30.4991 62.3637 33.027 67.7248 38.0825C73.086 43.138 75.7665 49.277 75.7665 56.4991C75.7665 59.0546 74.822 61.2213 72.9332 62.9991C71.0443 64.777 68.7665 65.6658 66.0998 65.6658C63.322 65.6658 60.9748 64.777 59.0582 62.9991C57.1415 61.2213 56.1832 59.0546 56.1832 56.4991C56.1832 54.388 55.4053 52.5963 53.8498 51.1241C52.2943 49.652 50.4053 48.9158 48.1832 48.9158C45.9053 48.9158 43.9887 49.652 42.4332 51.1241C40.8777 52.5963 40.0998 54.388 40.0998 56.4991C40.0998 61.9436 41.7803 66.652 45.1415 70.6241C48.5027 74.5963 53.211 77.4713 59.2665 79.2491L58.9332 80.9158C52.4887 79.1936 47.461 76.1796 43.8498 71.8741C40.2387 67.5686 38.4332 62.4436 38.4332 56.4991C38.4332 53.9436 39.3777 51.763 41.2665 49.9575C43.1553 48.152 45.461 47.2491 48.1832 47.2491C50.9053 47.2491 53.211 48.152 55.0998 49.9575C56.9887 51.763 57.9332 53.9436 57.9332 56.4991C57.9332 58.6103 58.7248 60.388 60.3082 61.8325C61.8915 63.277 63.822 63.9991 66.0998 63.9991C68.322 63.9991 70.197 63.277 71.7248 61.8325C73.2527 60.388 74.0165 58.6103 74.0165 56.4991C74.0165 49.777 71.5027 44.0825 66.4748 39.4158C61.447 34.7491 55.3498 32.4158 48.1832 32.4158C41.0165 32.4158 34.9193 34.7491 29.8915 39.4158C24.8637 44.0825 22.3498 49.777 22.3498 56.4991C22.3498 58.4991 22.572 60.5825 23.0165 62.7491C23.4609 64.9158 24.1276 67.2213 25.0165 69.6658L23.3498 70.4158C22.4609 67.8046 21.8082 65.3603 21.3915 63.0825C20.9748 60.8046 20.7665 58.6103 20.7665 56.4991C20.7665 49.388 23.4748 43.277 28.8915 38.1658C34.3082 33.0546 40.7387 30.4991 48.1832 30.4991ZM48.1832 14.0825C51.7943 14.0825 55.336 14.5269 58.8082 15.4158C62.2803 16.3047 65.822 17.6658 69.4332 19.4991L68.6832 20.9991C65.0165 19.2213 61.5165 17.9158 58.1832 17.0825C54.8498 16.2491 51.5165 15.8325 48.1832 15.8325C44.572 15.8325 41.1415 16.2352 37.8915 17.0408C34.6415 17.8463 31.3777 19.138 28.0998 20.9158L27.1832 19.5825C30.6277 17.7491 34.086 16.3741 37.5582 15.4575C41.0303 14.5408 44.572 14.0825 48.1832 14.0825ZM48.1832 38.9158C53.572 38.9158 58.0443 40.6796 61.5998 44.2075C65.1553 47.7353 66.9332 52.1103 66.9332 57.3325H65.1832C65.1832 52.4991 63.572 48.4991 60.3498 45.3325C57.1277 42.1658 53.072 40.5825 48.1832 40.5825C43.461 40.5825 39.4748 42.1241 36.2248 45.2075C32.9748 48.2908 31.3498 52.0546 31.3498 56.4991C31.3498 60.9436 32.1137 64.8463 33.6415 68.2075C35.1693 71.5686 37.8498 75.2213 41.6832 79.1658L40.4332 80.4158C36.5443 76.2491 33.7665 72.3463 32.0998 68.7075C30.4332 65.0686 29.5998 60.9991 29.5998 56.4991C29.5998 51.6103 31.4053 47.4575 35.0165 44.0408C38.6277 40.6241 43.0165 38.9158 48.1832 38.9158ZM52.6832 68.7491C50.9053 67.0825 49.5582 65.152 48.6415 62.9575C47.7248 60.763 47.2665 58.3046 47.2665 55.5825H48.9332C48.9332 58.0825 49.3498 60.3325 50.1832 62.3325C51.0165 64.3325 52.2665 66.0825 53.9332 67.5825C55.4887 69.027 57.2527 70.1241 59.2248 70.8741C61.197 71.6241 63.2387 71.9991 65.3498 71.9991C66.1277 71.9991 66.8777 71.9436 67.5998 71.8325C68.322 71.7213 69.0443 71.5825 69.7665 71.4158L70.0998 73.0825C69.322 73.2491 68.5303 73.388 67.7248 73.4991C66.9193 73.6103 66.1277 73.6658 65.3498 73.6658C62.961 73.6658 60.6832 73.2491 58.5165 72.4158C56.3498 71.5825 54.4053 70.3603 52.6832 68.7491Z" fill="#0F9958"/><path d="M0 24.75V4.75C2.57706e-07 2.12665 2.12665 0 4.75 0H24.75C25.1642 0 25.5 0.335786 25.5 0.75C25.5 1.16421 25.1642 1.5 24.75 1.5H4.75C2.95508 1.5 1.5 2.95507 1.5 4.75V24.75C1.5 25.1642 1.16421 25.5 0.75 25.5C0.335786 25.5 0 25.1642 0 24.75Z" fill="var(--text-4,#454947)"/><path d="M0 70.75V90.75C2.57706e-07 93.3734 2.12665 95.5 4.75 95.5H24.75C25.1642 95.5 25.5 95.1642 25.5 94.75C25.5 94.3358 25.1642 94 24.75 94H4.75C2.95508 94 1.5 92.5449 1.5 90.75V70.75C1.5 70.3358 1.16421 70 0.75 70C0.335786 70 0 70.3358 0 70.75Z" fill="var(--text-4,#454947)"/><path d="M95.5 24.75V4.75C95.5 2.12665 93.3734 0 90.75 0H70.75C70.3358 0 70 0.335786 70 0.75C70 1.16421 70.3358 1.5 70.75 1.5H90.75C92.5449 1.5 94 2.95507 94 4.75V24.75C94 25.1642 94.3358 25.5 94.75 25.5C95.1642 25.5 95.5 25.1642 95.5 24.75Z" fill="var(--text-4,#454947)"/><path d="M95.5 70.75V90.75C95.5 93.3734 93.3734 95.5 90.75 95.5H70.75C70.3358 95.5 70 95.1642 70 94.75C70 94.3358 70.3358 94 70.75 94H90.75C92.5449 94 94 92.5449 94 90.75V70.75C94 70.3358 94.3358 70 94.75 70C95.1642 70 95.5 70.3358 95.5 70.75Z" fill="var(--text-4,#454947)"/></svg></div>
    <div class="au-bio-ft"><button class="au-cta sec l3-btn" data-variant="secondary" data-size="lg" data-go="enter">Skip</button><button class="au-cta l3-btn" data-variant="brand" data-size="lg" data-go="enter">Allow</button></div>`,
   pin:()=>`${sb}<div class="au-top"><span></span><button class="au-help">Help</button></div><div class="au-body au-center">${MINT_MARK()}<h1>Enter Your PIN</h1><p class="au-sub">Access your account with your 4-digit PIN</p>
    <div class="au-dots ${AUTH.err?'err':''}">${[0,1,2,3].map(i=>`<i class="${i<AUTH.pin.length?'on':''}"></i>`).join('')}</div>${AUTH.err?'<p class="au-errt">Incorrect PIN. 2 attempts remaining</p>':''}<button class="au-link">Forgot PIN</button></div>${keypad()}`};
  let scr='splash';
  function render(){el.innerHTML=V[scr]();el.dataset.s=scr;if(scr==='splash'&&AUTH.splash==='s5'&&window.start3D)start3D(el.querySelector('.f3d'));}
- function go(s){scr=s;AUTH.err=false;render();}
+ // Step motion (user, 2026-11-01): a sheet step (Terms, the OTP sheet) slides up over Sign in and back down; a new page
+ // pushes in from the right and Back slides it out to the right. Jumps from the preview panel (authShow) stay instant.
+ const SHEET={tnc:'.au-sheet',otp2:'.o2'},PAGE={splash:0,login:1,tnc:1,otp2:1,otp:2,bio:3,pin:4},EZ='cubic-bezier(.2,0,0,1)',EOUT='cubic-bezier(.3,0,1,1)';
+ let still=false;
+ const frozen=n=>{n.classList.add('au-old');n.style.pointerEvents='none';return n;};
+ function go(s){const from=scr;scr=s;AUTH.err=false;
+  if(still||el.hidden||from===s||from==='splash'||s==='splash'||matchMedia('(prefers-reduced-motion: reduce)').matches){render();return;}
+  if(PAGE[from]===PAGE[s]){   // the same page underneath: a sheet opens, closes or swaps for another
+   const old=SHEET[from]?[el.querySelector(SHEET[from]),SHEET[s]?null:el.querySelector('.au-scrim')].filter(Boolean).map(n=>frozen(n.cloneNode(true))):[];
+   render();
+   if(SHEET[s]){const sh=el.querySelector(SHEET[s]),sc=el.querySelector('.au-scrim');if(sh)sh.animate([{transform:'translateY(100%)'},{transform:'none'}],{duration:340,easing:EZ});if(sc&&!SHEET[from])sc.animate([{opacity:0},{opacity:1}],{duration:240});}
+   old.forEach(n=>{el.appendChild(n);n.animate(n.classList.contains('au-scrim')?[{opacity:1},{opacity:0}]:[{transform:'none'},{transform:'translateY(100%)'}],{duration:260,easing:EOUT,fill:'forwards'});setTimeout(()=>n.remove(),280);});
+   return;}
+  const push=PAGE[s]>PAGE[from],D=340,snap=frozen(document.createElement('div'));snap.classList.add('au-pg');snap.append(...[...el.childNodes].map(n=>n.cloneNode(true)));
+  render();const pg=document.createElement('div');pg.className='au-pg';pg.append(...el.childNodes);el.append(pg);
+  if(push)el.insertBefore(snap,pg);else el.append(snap);
+  const top=[{transform:'translateX(100%)'},{transform:'none'}],under=[{transform:'translateX(-30%)',filter:'brightness(.7)'},{transform:'none',filter:'none'}];
+  (push?pg:snap).animate(push?top:[...top].reverse(),{duration:D,easing:EZ,fill:'forwards'});
+  (push?snap:pg).animate(push?[...under].reverse():under,{duration:D,easing:EZ,fill:'forwards'});
+  setTimeout(()=>{snap.remove();if(pg.parentNode!==el)return;while(pg.firstChild)el.insertBefore(pg.firstChild,pg);pg.remove();},D+20);}
  // OTP V2 (bottom sheet): wrong code → red shake + clear; right code → boxes glow in sequence, gather into one, become a mint check, then biometrics
  function paint2(){const sh=el.querySelector('.o2');if(!sh){render();return;}const o=AUTH.otp,n=o.length;
-  sh.classList.toggle('bad',!!AUTH.err);sh.querySelectorAll('.ob').forEach((b,i)=>{b.textContent=o[i]||'';b.classList.toggle('f',i<n);b.classList.toggle('cur',i===n);});
-  sh.querySelector('.o2rs').innerHTML=AUTH.err?'<span class="o2e">Incorrect code. Please try again.</span>':'Didn’t receive the code? <b>Resend</b>';
-  sh.querySelector('.o2v').disabled=n!==6;}
+  sh.classList.toggle('bad',!!AUTH.err);sh.classList.toggle('lock',!!AUTH.lock);sh.querySelectorAll('.ob').forEach((b,i)=>{b.textContent=o[i]||'';b.classList.toggle('f',i<n);b.classList.toggle('cur',i===n);});
+  sh.querySelector('.o2rs').innerHTML=AUTH.err?`<span class="o2e">${otpWrongMsg()}</span>`:otpRs(0);}
+ // the resend countdown ticks every second while an OTP step is open
+ setInterval(()=>{if((scr!=='otp'&&scr!=='otp2')||el.hidden||(scr==='otp2'&&(AUTH.err||el.querySelector('.o2.ok'))))return;const p=el.querySelector(scr==='otp2'?'.o2rs':'.au-rs');if(p){const h=otpRs(scr==='otp');if(p.innerHTML!==h)p.innerHTML=h;}},1000);
  function verify2(){const sh=el.querySelector('.o2');if(!sh||sh.classList.contains('ok'))return;
-  if(AUTH.otp==='000000'){AUTH.err=true;paint2();setTimeout(()=>{if(scr!=='otp2')return;AUTH.err=false;AUTH.otp='';paint2();},900);return;}
+  if(AUTH.otp==='000000'){otpWrong();AUTH.err=true;paint2();setTimeout(()=>{if(scr!=='otp2')return;AUTH.err=false;AUTH.otp='';paint2();},1500);return;}
   sh.classList.add('ok');setTimeout(()=>{if(scr==='otp2')go('bio');},2600);}
  // splash → sign-in: the splash is kept on top as a snapshot and dissolves away while the next screen rises in underneath
  function smoothTo(s){const snap=el.querySelector('.au-splash');const keep=snap&&snap.cloneNode(true);go(s);if(!keep)return;
@@ -2121,19 +2151,23 @@ const AUTH={splash:'s5',mode:'otp',num:'',otp:'',pin:'',done:null};
  function finish(){el.classList.add('out');setTimeout(()=>{el.hidden=true;el.classList.remove('out');stack=['s01'];show();if(AUTH.done)AUTH.done();},280);}
  window.authStart=(onDone)=>{let sk=false;try{sk=localStorage.getItem('kuber-skip-auth')==='1';}catch(e){}if(sk){clearTimeout(AUTH.t);el.hidden=true;if(onDone)onDone();return;}AUTH.done=onDone;AUTH.num='';AUTH.otp='';AUTH.pin='';el.hidden=false;go('splash');clearTimeout(AUTH.t);AUTH.t=setTimeout(()=>smoothTo(AUTH.mode==='pin'?'pin':'login'),AUTH.splash==='s5'?5400:AUTH.splash==='s1'?4200:3000);};
  window.authSkipNow=()=>{clearTimeout(AUTH.t);if(!el.hidden){el.hidden=true;stack=['s01'];show();}};
- window.authShow=s=>{clearTimeout(AUTH.t);AUTH.done=null;AUTH.otp='';AUTH.pin='';AUTH.num=s==='splash'||s==='login'?'':'9876543210';el.hidden=false;go(s);};   // the preview's panel: open one sign-in step
+ window.authShow=s=>{clearTimeout(AUTH.t);AUTH.done=null;AUTH.otp='';AUTH.pin='';AUTH.num=s==='splash'||s==='login'?'':'9876543210';otpReset();el.hidden=false;still=true;go(s);still=false;};   // the preview's panel: open one sign-in step
  el.addEventListener('click',e=>{e.stopPropagation();const k=e.target.closest('[data-k]');
-  if(k){const v=k.dataset.k;const key=scr==='login'||scr==='tnc'?'num':scr==='otp'||scr==='otp2'?'otp':scr==='pin'?'pin':null;if(scr==='otp2'&&el.querySelector('.o2.ok'))return;if(!key||scr==='tnc')return;const max={num:10,otp:6,pin:4}[key];
-   if(v==='⌫')AUTH[key]=AUTH[key].slice(0,-1);else if(AUTH[key].length<max)AUTH[key]+=v;AUTH.err=false;if(scr==='otp2'){paint2();return;}render();
+  if(k){const v=k.dataset.k;const key=scr==='login'||scr==='tnc'?'num':scr==='otp'||scr==='otp2'?'otp':scr==='pin'?'pin':null;if(scr==='otp2'&&el.querySelector('.o2.ok'))return;if(!key||scr==='tnc')return;if(key==='otp'&&AUTH.lock)return;const max={num:10,otp:6,pin:4}[key];
+   const was=AUTH[key].length;if(v==='⌫')AUTH[key]=AUTH[key].slice(0,-1);else if(key==='num'&&AUTH.num.length<max)AUTH.num+=v+'9846098460'.slice(AUTH.num.length+1);   /* prototype: one digit fills the rest of the 10-digit number (user, 2026-11-01) */
+   else if(AUTH[key].length<max)AUTH[key]+=v;AUTH.err=false;const full=key==='otp'&&was===5&&AUTH.otp.length===6;   // OTP: verifies itself once all 6 digits are in
+   if(scr==='otp2'){paint2();if(full)setTimeout(()=>{if(scr==='otp2'&&AUTH.otp.length===6)verify2();},250);return;}render();
+   if(full)setTimeout(()=>{if(scr!=='otp'||AUTH.otp.length!==6)return;if(AUTH.otp==='000000'){otpWrong();AUTH.err=true;AUTH.otp='';render();}else go('bio');},250);
    if(key==='pin'&&AUTH.pin.length===4){setTimeout(()=>{if(AUTH.pin==='0000'){AUTH.err=true;AUTH.pin='';render();}else finish();},250);}return;}
   const c=e.target.closest('[data-chk]');if(c){c.setAttribute('aria-pressed',c.getAttribute('aria-pressed')!=='true');const all=[...el.querySelectorAll('[data-chk]')].every(b=>b.getAttribute('aria-pressed')==='true');el.querySelector('.au-sheet .au-cta').disabled=!all;return;}
   if(e.target.closest('[data-x="err"]')){AUTH.err=false;render();return;}
   if(e.target.closest('.au-scrim')){if(scr==='otp2'&&el.querySelector('.o2.ok'))return;go('login');return;}
+  if(e.target.closest('[data-rs]')){if(AUTH.lock||otpLeft()||AUTH.rsN>=OTP_RESENDS)return;AUTH.rsN++;AUTH.rsAt=Date.now()+OTP_WAIT*1000;AUTH.otp='';AUTH.err=false;if(scr==='otp2')paint2();else render();return;}
   const g=e.target.closest('[data-go]');if(!g||g.disabled)return;const to=g.dataset.go;
   if(to==='verify'){if(AUTH.otp==='000000'){AUTH.err=true;render();}else go('bio');return;}
   if(to==='enter'){finish();return;}
   if(to==='verify2'){verify2();return;}
-  if(to==='otp'){AUTH.otp='';if(window.OTPV==='v2'){go('otp2');return;}}go(to);});
+  if(to==='otp'){otpReset();if(window.OTPV==='v2'){go('otp2');return;}}go(to);});
  window.authOtpV2Verify=()=>verify2();})();
 
 /* ===== Flow presets (V1, V2) — applied on load and on Restart; the active flow is remembered ===== */
@@ -2201,7 +2235,12 @@ setTimeout(()=>applyPresentationDefaults(),0);
    the taps, so its hover / press is mirrored onto the pair (styles in src/prototype-l3.css). */
 (()=>{const box=e=>[e.style.left,e.style.top,e.style.width,e.style.height].join();
  $$('#device .l3b').forEach(sh=>{const k=box(sh),lb=(()=>{let n=sh.nextElementSibling;while(n&&!n.classList.contains('l3b-lb'))n=n.nextElementSibling;return n;})(),
-  hs=[...sh.closest('.screen').querySelectorAll('.hs')].find(h=>box(h)===k);if(hs)hs._l3=[sh,lb].filter(Boolean);});
+  hs=[...sh.closest('.screen').querySelectorAll('.hs')].find(h=>box(h)===k);if(!hs)return;
+  // everything drawn inside the button (icons, logos) shrinks with it, about the button's centre (user, 2026-11-01)
+  const px=v=>parseFloat(v)||0,B=[sh.style.left,sh.style.top,sh.style.width,sh.style.height].map(px),cx=B[0]+B[2]/2,cy=B[1]+B[3]/2;
+  const ride=[...sh.parentElement.children].filter(e=>e!==sh&&e!==lb&&!e.classList.contains('hs')&&e.style.left&&(()=>{const q=[e.style.left,e.style.top,e.style.width,e.style.height].map(px);return q[0]>=B[0]-1&&q[1]>=B[1]-1&&q[0]+q[2]<=B[0]+B[2]+1&&q[1]+q[3]<=B[1]+B[3]+1;})());
+  [...ride,lb].forEach(e=>{if(!e)return;e.style.transformOrigin=(cx-px(e.style.left))+'px '+(cy-px(e.style.top))+'px';});ride.forEach(e=>e.classList.add('l3b-ride'));
+  hs._l3=[sh,lb,...ride].filter(Boolean);});
  const set=(e,c,on)=>{const h=e.target.closest&&e.target.closest('.hs');if(h&&h._l3)h._l3.forEach(x=>x.classList.toggle(c,on));};
  const dv=document.getElementById('device');
  dv.addEventListener('pointerdown',e=>set(e,'l3b-press',true));
@@ -2241,5 +2280,58 @@ setTimeout(()=>applyPresentationDefaults(),0);
  ['pointerup','pointercancel'].forEach(n=>dv.addEventListener(n,()=>{const t=prs;prs=null;paint(t,'ix-press',false);if(t&&t!==hov&&lay&&lay._for===t){lay.remove();lay._for=null;}}));
  // A tap usually moves to another screen or sheet; drop the states so nothing stays lit behind it.
  dv.addEventListener('click',()=>setTimeout(clear,180));dv.addEventListener('scroll',clear,true);})();
+
+/* Sheets slide up from the bottom and back down, their scrims fade, and the full-screen quiz pushes in from the right and
+   slides back out (user, 2026-11-01). The prototype opens / closes them with el.hidden, so that property is wrapped here:
+   showing plays the way in, hiding plays the way out first and only then really hides. */
+(()=>{const P=Object.getOwnPropertyDescriptor(HTMLElement.prototype,'hidden'),EZ='cubic-bezier(.2,0,0,1)',EOUT='cubic-bezier(.3,0,1,1)';
+ const KIND={sheet:[[{transform:'translateY(100%)'},{transform:'none'}],340,260],scrim:[[{opacity:0},{opacity:1}],240,240],page:[[{transform:'translateX(100%)'},{transform:'none'}],340,300]};
+ function slide(el,kind){if(!el)return;const [kf,dIn,dOut]=KIND[kind];let out=null;
+  Object.defineProperty(el,'hidden',{configurable:true,get(){return !!out||P.get.call(el);},set(v){
+   if(!v){if(out){out.cancel();out=null;}const was=P.get.call(el);P.set.call(el,false);if(was&&!calm())el.animate(kf,{duration:dIn,easing:EZ});return;}
+   if(out||P.get.call(el))return;if(calm()){P.set.call(el,true);return;}
+   const a=out=el.animate([...kf].reverse(),{duration:dOut,easing:EOUT,fill:'forwards'});
+   setTimeout(()=>{if(out!==a)return;out=null;P.set.call(el,true);a.cancel();},dOut);}});}
+ $$('#device .lsh').forEach(e=>slide(e,'sheet'));$$('#device .lsh-bg').forEach(e=>slide(e,'scrim'));slide(document.getElementById('fq'),'page');})();
+
+/* --- L3 Actionbar (Figma "L3: Actionbar" 4543:65480; centred = isCenterd=True 5579:1794): one <header class="ab"> per
+   screen on top of its .fixed.top. The Figma bar pieces it replaces get .ab-x (hidden, still updated by the code above). --- */
+(()=>{const I=n=>`<i class="ab-i" data-i="${n}" aria-hidden="true"></i>`;
+ const BACK=`<button type="button" class="ab-back" data-to="back" aria-label="Back">${I('back')}</button>`;
+ const ACT=(n,to,l)=>`<button type="button" class="l3-btn" data-variant="tertiary" data-size="sm" data-to="${to}" aria-label="${l}">${I(n)}</button>`;
+ const SEARCH=ACT('search','s02','Search'),WALLET=ACT('wallet','s09','Wallet');
+ const HELP='<button type="button" class="l3-btn" data-variant="tertiary" data-size="sm">Help</button>';
+ const top=e=>parseFloat(e.style.top),bot=e=>top(e)+parseFloat(e.style.height||0);
+ function bar(id,{lead='',title='',desc='',actions='',centered=false,cut=80,keep=()=>false}){
+  const sc=document.getElementById(id);const fx=sc&&$('.fixed.top',sc);if(!fx)return null;
+  [...fx.children].forEach(e=>{if(!isNaN(top(e))&&top(e)<cut&&bot(e)<=cut+2&&!keep(e))e.classList.add('ab-x');});
+  const h=document.createElement('header');h.className='ab';h.dataset.level=lead.includes('ab-back')?2:1;if(centered)h.dataset.centered='';
+  h.innerHTML=`<div class="ab-row"><div class="ab-l">${lead}</div><div class="ab-c">${title?`<h1 class="ab-t">${title}</h1>`:''}${desc?`<p class="ab-d">${desc}</p>`:''}</div><div class="ab-actions">${actions}</div></div><div class="ab-bottom"></div>`;
+  fx.appendChild(h);return h;}
+ const txt=(id,s)=>{const p=[...$('.fixed.top',document.getElementById(id)).querySelectorAll('p')].find(x=>x.textContent.trim().startsWith(s));return p?p.textContent.trim():s;};
+ bar('s01',{lead:'<button type="button" class="ab-av" data-to="s10" aria-label="Profile">AJ</button>',actions:SEARCH+WALLET});
+ bar('s02',{lead:BACK});
+ bar('s03',{title:'Market',actions:SEARCH+WALLET});
+ ['s07','s17'].forEach(id=>bar(id,{title:'Portfolio',actions:SEARCH+WALLET,cut:84}));
+ bar('s22',{title:'Futures',actions:SEARCH});bar('s23',{title:'Options',actions:SEARCH});
+ bar('s19',{lead:BACK,title:'Payment Details',actions:HELP});
+ // Asset page: the Spot / Futures switch is the centred content.
+ const h4=bar('s04',{lead:BACK,actions:SEARCH,centered:true,keep:e=>e.classList.contains('swc')});
+ if(h4){const sw=$('.swc',document.getElementById('s04'));if(sw)$('.ab-c',h4).appendChild(sw);}
+ // Orderpads: logo + ticker over price + change (mirrors the live Figma texts), Markets / Futures tabs in ↓ Content bottom.
+ ['s05','s13','s14','s15'].forEach(id=>{const sc=document.getElementById(id);const fx=sc&&$('.fixed.top',sc);if(!fx||!$('[data-b="tk"]',fx))return;
+  const h=bar(id,{lead:BACK,title:' ',desc:' ',centered:true,cut:86});const t=$('.ab-t',h),d=$('.ab-d',h);
+  const src=['logo','tk','price','chgp'].map(k=>$(`[data-b="${k}"]`,fx));const ic=[...fx.children].find(e=>e.tagName==='svg'&&top(e)===60);
+  const paint=()=>{const [lg,tk,pr,ch]=src;t.innerHTML=(lg?`<i class="${lg.className}" style="position:static;width:16px;height:16px;border-radius:50%;flex:none"></i>`:'')+`<span>${tk?tk.textContent:''}</span>`;
+   d.innerHTML=`<span class="ab-pr">${pr?pr.innerHTML:''}</span>`+(ch?`<span class="${ch.className.replace(/\b(tx|ab-x)\b/g,'')}" style="position:static">${ch.textContent}</span>`:'')+(ic?ic.outerHTML.replace(/style="[^"]*"/,'style="position:static;width:12px;height:12px;flex:none"').replace(/\bab-x\b/,''):'');};
+  paint();const mo=new MutationObserver(paint);src.forEach(e=>e&&mo.observe(e,{childList:true,characterData:true,subtree:true,attributes:true}));
+  const tabs=$('.op-tabs',fx);if(tabs){$('.ab-bottom',h).appendChild(tabs);tabs.querySelectorAll('button').forEach(b=>b.classList.add('ab-tab'));}});
+ // Orders & History: centred title, Help, Open / History tabs (they drive the existing tab hotspots).
+ const h8=bar('s08',{lead:BACK,title:txt('s08','Orders'),actions:HELP,centered:true,cut:122});
+ if(h8){const fx=$('.fixed.top',document.getElementById('s08'));const hs=[...fx.querySelectorAll('.hs')].filter(b=>top(b)===88).sort((a,b)=>top(a)-top(b)||parseFloat(a.style.left)-parseFloat(b.style.left));
+  const tb=$('.ab-bottom',h8);tb.setAttribute('role','tablist');
+  [txt('s08','Open Orders'),'History'].forEach((l,i)=>{const b=document.createElement('button');b.type='button';b.className='ab-tab';b.setAttribute('role','tab');b.setAttribute('aria-selected',i===0);b.textContent=l;
+   b.addEventListener('click',ev=>{ev.stopPropagation();if(hs[i])hs[i].click();tb.querySelectorAll('.ab-tab').forEach(x=>x.setAttribute('aria-selected',x===b));});tb.appendChild(b);});}
+})();
 
 })();

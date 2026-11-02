@@ -436,7 +436,7 @@ ol button.on{background:var(--stage)}
 .svs.dim{opacity:.45}
 #s04 [data-b="price"].up{color:var(--green-2)!important}#s04 [data-b="price"].dn{color:var(--red)!important}
 .lsh-bg{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:40}
-.lsh{position:absolute;left:0;right:0;bottom:0;z-index:41;background:var(--surface);border-top:1px solid var(--surface-2);border-radius:24px 24px 0 0;padding:8px 16px 24px;animation:lshup .22s ease-out}
+.lsh{position:absolute;left:0;right:0;bottom:0;z-index:41;background:var(--surface);border-top:1px solid var(--surface-2);border-radius:24px 24px 0 0;padding:8px 16px 24px}   /* slides in from app.js (user, 2026-11-01) */
 @keyframes lshup{from{transform:translateY(40px);opacity:.4}}
 .lsh-grab{width:36px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 12px}
 .lsh-hd{display:flex;align-items:center;gap:12px;margin-bottom:16px}
@@ -811,6 +811,7 @@ ol button.on{background:var(--stage)}
 .auth .au-ph{margin-top:16px;font:600 14px/20px var(--font)}
 .auth .au-big{margin-top:40px;font:700 28px/36px var(--font)}.auth .au-big.ph{font:700 28px/36px var(--font);letter-spacing:.02em;color:var(--text-3)}
 .auth .au-caret{width:1px;height:32px}
+.au-big.ph .au-caret{order:-1;margin:0 2px 0 0}   /* empty field: the caret sits before the placeholder, like a real input (user, 2026-11-01) */
 .auth .au-rs{margin-top:48px;font:400 12px/16px var(--font)}.auth .au-rs b{font-weight:700;text-decoration:underline;text-underline-offset:3px}
 .auth .au-foot{bottom:232px}.auth .au-cta{height:48px;font:700 16px/22px var(--font)}
 .auth .au-cta:disabled{background:var(--surface);color:var(--text-3);box-shadow:inset 0 0 0 100px rgba(232,232,232,.06)}
@@ -1226,6 +1227,9 @@ ol button.on{background:var(--stage)}
 @keyframes o2glow{to{box-shadow:0 0 0 1px rgba(119,196,140,.35),0 0 34px rgba(119,196,140,.75)}}
 .auth .o2.ok .o2t{opacity:0;transform:translateY(-6px);transition-delay:.55s}.auth .o2.ok .o2t2{opacity:1;transform:none;transition:opacity .35s .7s,transform .4s .7s}
 .auth .o2.ok .o2s1,.auth .o2.ok .o2rs{opacity:0;transition-delay:.45s}
+/* OTP resend countdown + lock after 3 wrong codes (user, 2026-11-01) */
+.auth .rs-t{font-variant-numeric:tabular-nums;color:var(--text)}.auth [data-rs]{cursor:pointer}
+.auth .o2.lock .o2row{opacity:.4;transition:opacity .3s}
 .auth .o2v{position:relative;display:block;width:100%;height:48px;margin:28px 0 0;border-radius:12px;font:700 16px/22px var(--font);transition:opacity .3s}
 .auth .o2.ok .o2v{opacity:0;pointer-events:none;transition-delay:.3s}
 
@@ -1685,3 +1689,10 @@ ol button.on{background:var(--stage)}
 .mcd8bdf{background-image:url('data:image/svg+xml;utf8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 28 28%27%3E%3Crect width=%2728%27 height=%2728%27 rx=%2714%27 fill=%27%23000%27/%3E%3C/svg%3E')}
 .me51084{background-image:url('data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27><circle cx=%2712%27 cy=%2712%27 r=%2712%27 fill=%27%231565d8%27/><path d=%27M15.8 8.6A5 5 0 1 0 15.8 15.4%27 fill=%27none%27 stroke=%27white%27 stroke-width=%272.4%27 stroke-linecap=%27round%27/></svg>')}
 .mf8a587{background-image:url('data:image/svg+xml;utf8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 56 56%27%3E%3Cdefs%3E%3ClinearGradient id=%27g%27 x1=%270%27 y1=%270%27 x2=%271%27 y2=%271%27%3E%3Cstop offset=%270%27 stop-color=%27%231b3a63%27/%3E%3Cstop offset=%271%27 stop-color=%27%230c1a2c%27/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=%2756%27 height=%2756%27 fill=%27url(%23g)%27/%3E%3C/svg%3E')}
+
+/* Sign-in step motion (app.js go): pages slide as whole layers; snapshots of the old step don't replay their entrance animations (user, 2026-11-01) */
+.auth .au-pg{position:absolute;inset:0;background:var(--bg);overflow:hidden}
+.auth .au-old,.auth .au-old *{animation:none!important}
+
+/* The phone frame clips but never scrolls: a field focused inside a page that is still sliding in used to drag it sideways (user, 2026-11-01) */
+#device{overflow:clip}
